@@ -58,3 +58,11 @@ The system is built using:
 git clone https://github.com/Venus-16/MFU-DormFix.git
 cd MFU-DormFix
 
+### 2. Install dependencies
+รันคำสั่งนี้ในโฟลเดอร์โปรเจกต์หลังจาก `cd MFU-DormFix`:
+
+```bash
+npm install
+
+
+
