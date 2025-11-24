@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Repair Report</title>
+    <link rel="shortcut icon" href="/public/img/MFU.png" type="image/x-icon">
+    <link rel="stylesheet" href="/public/css/staff/repair_report_staff.css" />
+    <link rel="stylesheet" href="/public/css/staff/nav_bar_staff.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        /* Notification Dropdown Style */
+                .dropdown-fb {
+            position: fixed;
+            top: 75px;
+            right: 40px;
+            width: 350px;
+            background: #ffffff;
+            border: 2px solid #f7d86e;
+            border-radius: 18px;
+            box-shadow: 0 6px 24px #0002;
+            z-index: 3000;
+            display: none;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            transition: box-shadow 0.2s;
+        }
+        .dropdown-fb.show {
+            display: block !important;
+        }
+        .dropdown-fb-header {
+            padding: 16px 20px 8px 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #fae3a1;
+        }
+        .dropdown-fb-header .btn-link {
+            background: none;
+            border: none;
+            color: #1976d2;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        .dropdown-fb-tabs {
+            display: flex;
+            padding: 8px 20px;
+            gap: 10px;
+            border-bottom: 1px solid #fae3a1;
+        }
+        .fb-tab {
+            padding: 7px 22px;
+            border-radius: 20px;
+            border: none;
+            background: #f7e7b9;
+            font-weight: 500;
+            color: #25408f;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.2s, color 0.2s;
+        }
+        .fb-tab.active {
+            background: #25408f;
+            color: #fff;
+            font-weight: bold;
+        }
+        .dropdown-fb-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            max-height: 340px;
+            overflow-y: auto;
+        }
+        .fb-noti-item {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            padding: 16px 22px 14px 22px;
+            border-bottom: 1px solid #f7e7b9;
+            background: #fffbe9;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .fb-noti-item.unread {
+            background: #fff9e1;
+        }
+        .fb-noti-item.read {
+            background: #f3f2f2;
+            color: #aaa;
+        }
+        .fb-noti-top {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .fb-noti-icon {
+            font-size: 1.6rem;
+            margin-right: 2px;
+        }
+        .fb-noti-title {
+            font-weight: bold;
+            font-size: 1.08rem;
+            flex: 1;
+        }
+        .fb-noti-dot {
+            width: 11px;
+            height: 11px;
+            background: #1976d2;
+            border-radius: 50%;
+            margin-left: 7px;
+            margin-right: 2px;
+            display: inline-block;
+        }
+        .fb-noti-date {
+            font-size: 0.96rem;
+            color: #888;
+            margin-bottom: 2px;
+        }
+        .fb-noti-msg {
+            font-size: 0.97rem;
+            color: #444;
+            margin-bottom: 1px;
+        }
+        .dropdown-fb-footer {
+            padding: 12px 0;
+            text-align: center;
+            border-top: 1px solid #fae3a1;
+            background: #fffbe9;
+        }
+        .fb-seeall {
+            background: none;
+            border: none;
+            color: #1976d2;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        #notificationBtn .badge {
+            font-size: 1rem;
+            top: 2px;
+            left: 22px;
+            padding: 0 6px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="navbar"></div>
+    <div class="d-flex">
+        <div id="sidebar"></div>
+        <div class="main-content">
+            <div class="container py-5" id="main-content-area">
+                <div id="loading-overlay"></div>
+                <h2>Repair Report List</h2>
+                <!-- Filter/Search Section -->
+                <div class="d-flex flex-wrap align-items-center gap-4 mt-3" style="max-width: 900px;">
+                    <div class="d-flex flex-column" style="width: 180px;">
+                        <label for="dormitory" class="form-label mb-1"
+                            style="font-weight: 500; font-size: 0.85rem;">Dormitory</label>
+                        <select class="form-select form-select-sm" id="dormitory" name="dormitory"></select>
+                    </div>
+                    <div class="d-flex flex-column" style="width: 180px;">
+                        <label for="date" class="form-label mb-1"
+                            style="font-weight: 500; font-size: 0.85rem;">Date</label>
+                        <div class="input-group input-group-sm">
+                            <input type="date" class="form-control" id="date" name="date" />
+                            <i class="bi bi-calendar-event"></i>
+                        </div>
+                    </div>
+                </div>
+                <!-- Search by Section -->
+                <div class="search-type-section">
+                    <label class="form-label mb-0" id="searchby" style="font-weight: 500; font-size: 0.85rem; min-width:75px;">Search
+                        by</label>
+                    <div id="search-type-btn-group" class="search-type-btn-group">
+                        <button class="search-type-btn active" data-type="all" type="button">All</button>
+                        <button class="search-type-btn" data-type="article" type="button">Item</button>
+                        <button class="search-type-btn" id="nameroom" data-type="nameroom" type="button">Name or Room Number</button>
+                    </div>
+                    <select class="repairtype-select" id="repairtype-dropdown" name="repairtype">
+                        <option value="">All Repair Types</option>
+                    </select>
+                    <div id="search-bar-wrapper" class="flex-grow-1 show-all">
+                        <div id="search-bar-input-area">
+                            <div class="search-input-area search-input-all">
+                                <div class="input-group input-group-sm shadow-sm rounded" style="background: #F5F5F5;">
+                                    <input type="search" class="form-control border-0" id="search-all"
+                                        placeholder="Search anything..." autocomplete="off" />
+                                    <span class="input-group-text bg-transparent border-0">
+                                        <i class="fa-solid fa-magnifying-glass"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="search-input-area search-input-article">
+                                <div class="input-group input-group-sm shadow-sm rounded" style="background: #F5F5F5;">
+                                    <input type="search" class="form-control border-0" id="search-article"
+                                        placeholder="Search Item..." autocomplete="off" />
+                                    <span class="input-group-text bg-transparent border-0">
+                                        <i class="fa-solid fa-magnifying-glass"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="search-input-area search-input-nameroom">
+                                <div class="input-group input-group-sm shadow-sm rounded" style="background: #F5F5F5;">
+                                    <input type="search" class="form-control border-0" id="search-nameroom"
+                                        placeholder="Search Name or Room Number..." autocomplete="off" />
+                                    <span class="input-group-text bg-transparent border-0">
+                                        <i class="fa-solid fa-magnifying-glass"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="card-container" class="mt-4"></div>
+            </div>
+        </div>
+    </div>
+<script>
+    let currentSearchType = 'all';
+    let repairTypeOptions = [];
+    let dormitoryOptions = [];
+    let currentRepairType = '';
+
+    function showLoaderContent() {
+        const overlay = document.getElementById('loading-overlay');
+        overlay.style.display = 'flex';
+        overlay.innerHTML = '';
+        fetch('/loading')
+            .then(res => res.text())
+            .then(html => {
+                overlay.innerHTML = `<div class="loader-content">${html}</div>`;
+                overlay.style.background = '#fffbe9';
+            });
+    }
+    function hideLoaderContent() {
+        const overlay = document.getElementById('loading-overlay');
+        overlay.style.display = 'none';
+        overlay.innerHTML = '';
+    }
+    // Notification setup
+setTimeout(() => {
+  let allNotifications = [];
+  let filterType = "all";
+  // เลือก element
+  const notificationBtn = document.getElementById("notificationBtn");
+  const notificationDropdown = document.getElementById("notificationDropdown");
+  const notificationCount = document.getElementById("notificationCount");
+  const notificationList = document.getElementById("notificationList");
+  const markAllAsReadBtn = document.getElementById("markAllAsReadBtn");
+  const allNotiBtn = document.getElementById("allNotiBtn");
+  const unreadNotiBtn = document.getElementById("unreadNotiBtn");
+
+  // Toggle dropdown
+  notificationBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    notificationDropdown.classList.toggle("show");
+    renderNotifications();
+  });
+  // Close dropdown when clicking outside
+  document.addEventListener("click", (e) => {
+    if (!notificationDropdown.contains(e.target) && !notificationBtn.contains(e.target)) {
+      notificationDropdown.classList.remove("show");
+    }
+  });
+
+  function formatDateDMYHM(dateStr) {
+    const d = new Date(dateStr);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    let hour = d.getHours();
+    let min = String(d.getMinutes()).padStart(2, '0');
+    let ampm = "AM";
+    if (hour >= 12) {
+      ampm = "PM";
+      if (hour > 12) hour -= 12;
+    }
+    if (hour === 0) hour = 12;
+    return `${day}/${month}/${year} ${hour}:${min} ${ampm}`;
+  }
+
+  function renderNotifications() {
+    notificationList.innerHTML = "";
+    let filtered = [];
+    if (filterType === "unread") {
+      filtered = allNotifications.filter(n => n.is_read === 0);
+    } else {
+      filtered = allNotifications;
+    }
+    if (filtered.length === 0) {
+      notificationList.innerHTML = `<li class="px-3 py-2 text-muted small">No notifications</li>`;
+      return;
+    }
+    filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    filtered.forEach(noti => {
+                        const li = document.createElement("li");
+                        li.className =
+                            "px-3 py-2 small border-bottom cursor-pointer " +
+                            (noti.is_read === 0
+                                ? "bg-warning-subtle text-dark"
+                                : "bg-white text-muted");
+
+                        li.innerHTML = `
+                            <div class="fw-bold">${noti.title || ""}</div>
+                            <div class="fw-normal">${noti.message || ""}</div>
+
+                            <div class="small text-secondary">${formatDateDMYHM(noti.created_at)}</div>
+                        `;
+
+      li.addEventListener("click", async () => {
+        if (noti.link) window.location.href = noti.link;
+        await fetch("/admin/notifications/read", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ notification_id: noti.notification_id })
+        });
+        noti.is_read = 1;
+        renderNotifications();
+        updateNotificationCount();
+      });
+
+      notificationList.appendChild(li);
+    });
+  }
+
+  async function fetchNotifications() {
+    try {
+      const res = await fetch("/admin/notifications");
+      if (!res.ok) throw new Error("Failed to fetch");
+      const data = await res.json();
+      allNotifications = data;
+      renderNotifications();
+      updateNotificationCount();
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  function updateNotificationCount() {
+    const unread = allNotifications.filter(n => n.is_read === 0).length;
+    if (unread > 0) {
+      notificationCount.textContent = unread;
+      notificationCount.classList.remove("d-none");
+    } else {
+      notificationCount.classList.add("d-none");
+    }
+  }
+
+  markAllAsReadBtn.addEventListener("click", async function () {
+    try {
+      await fetch('/admin/notifications/read-all', {
+        method: 'POST',
+        credentials: 'include'
+      });
+      await fetchNotifications();
+    } catch (e) {
+      console.error(e);
+    }
+  });
+
+  allNotiBtn.addEventListener("click", function () {
+    filterType = "all";
+    allNotiBtn.classList.add("active");
+    unreadNotiBtn.classList.remove("active");
+    renderNotifications();
+  });
+
+  unreadNotiBtn.addEventListener("click", function () {
+    filterType = "unread";
+    allNotiBtn.classList.remove("active");
+    unreadNotiBtn.classList.add("active");
+    renderNotifications();
+  });
+
+  fetchNotifications();
+  setInterval(fetchNotifications, 30000);
+}, 300); // รอ navbar insert ก่อน
+
+
+    window.addEventListener("DOMContentLoaded", () => {
+        showLoaderContent();
+
+        Promise.all([
+            fetch('/admin/sidebar'),
+            fetch('/admin/api/dormitories'),
+            fetch('/admin/api/categories')
+        ]).finally(() => {
+            setTimeout(hideLoaderContent, 600);
+        });
+
+        // โหลด Navbar & Sidebar ของ Admin
+        fetch('/admin/sidebar')
+            .then(res => res.text())
+            .then(data => {
+                const temp = document.createElement('div');
+                temp.innerHTML = data;
+                const navbar = temp.querySelector('.navbar');
+                const tabs = temp.querySelector('.tabs');
+                const logoutModal = temp.querySelector('#logoutModal');
+                const sidebarToggleBtn = temp.querySelector('.sidebar-toggle-button');
+const notificationDropdown = temp.querySelector('#notificationDropdown');
+
+            if (navbar) document.getElementById('navbar').appendChild(navbar);
+            if (tabs) document.getElementById('sidebar').appendChild(tabs);
+            if (logoutModal) document.body.appendChild(logoutModal);
+            if (notificationDropdown) document.body.appendChild(notificationDropdown);
+
+                if (sidebarToggleBtn) {
+                    sidebarToggleBtn.addEventListener('click', () => {
+                        document.body.classList.toggle("sidebar-collapsed");
+                    });
+                }
+
+                window.toggleSidebar = function () {
+                    tabs.classList.toggle("collapsed");
+                    document.body.classList.toggle("sidebar-collapsed");
+                };
+
+                window.showLogoutModal = function () {
+                    const modal = new bootstrap.Modal(document.getElementById('logoutModal'));
+                    modal.show();
+                };
+
+                window.handleLogout = function () {
+                    window.location.href = "/login";
+                };
+
+                const currentPath = window.location.pathname;
+                const tabItems = document.querySelectorAll('.tab-item');
+                tabItems.forEach(item => {
+                    const itemHref = item.getAttribute('href');
+                    if (itemHref) {
+                        const normalizedItemHref = itemHref.replace(/^\/|\/$/g, '');
+                        const normalizedCurrentPath = currentPath.replace(/^\/|\/$/g, '');
+                        if (normalizedCurrentPath === normalizedItemHref) {
+                            item.classList.add('active');
+                        }
+                    }
+                });
+
+                // ✅ After navbar is loaded, setup notification event
+                setupNotification();
+            });
+
+        // Dormitory dropdown
+        fetch('/admin/api/dormitories')
+            .then(res => res.json())
+            .then(dorms => {
+                dormitoryOptions = dorms;
+                const dormSel = document.getElementById('dormitory');
+                dormSel.innerHTML = '<option value="">All Dormitories</option>';
+                dorms.forEach(d => {
+                    dormSel.innerHTML += `<option value="${d.dorm_name}">${d.dorm_name}</option>`;
+                });
+                loadRepairReports();
+            });
+
+        // Repair Type dropdown
+        fetch('/admin/api/categories')
+            .then(res => res.json())
+            .then(data => {
+                repairTypeOptions = data;
+                const dropdown = document.getElementById('repairtype-dropdown');
+                dropdown.innerHTML = `<option value="">All Repair Types</option>`;
+                repairTypeOptions.forEach(c => {
+                    dropdown.innerHTML += `<option value="${c.category_name}">${c.category_name}</option>`;
+                });
+            });
+
+        // Search type buttons
+        const btnGroup = document.getElementById('search-type-btn-group');
+        const searchBarWrapper = document.getElementById('search-bar-wrapper');
+        btnGroup.addEventListener('click', function (e) {
+            const btn = e.target.closest('.search-type-btn');
+            if (!btn) return;
+            btnGroup.querySelectorAll('.search-type-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentSearchType = btn.dataset.type;
+            searchBarWrapper.className = "flex-grow-1 " +
+                (currentSearchType === "all" ? "show-all" :
+                    currentSearchType === "article" ? "show-article" : "show-name-room");
+            setTimeout(() => {
+                if (currentSearchType === 'all') {
+                    document.getElementById('search-all').focus();
+                } else if (currentSearchType === 'article') {
+                    document.getElementById('search-article').focus();
+                } else if (currentSearchType === 'nameroom') {
+                    document.getElementById('search-nameroom').focus();
+                }
+            }, 100);
+            loadRepairReports();
+        });
+
+        document.getElementById('search-bar-input-area').addEventListener('input', function (e) {
+            if (e.target.id === 'search-all' && currentSearchType === 'all') {
+                loadRepairReports();
+            } else if (e.target.id === 'search-article' && currentSearchType === 'article') {
+                loadRepairReports();
+            } else if (e.target.id === 'search-nameroom' && currentSearchType === 'nameroom') {
+                loadRepairReports();
+            }
+        });
+
+        document.getElementById('dormitory').addEventListener('change', loadRepairReports);
+        document.getElementById('date').addEventListener('change', loadRepairReports);
+        document.getElementById('repairtype-dropdown').addEventListener('change', function () {
+            currentRepairType = this.value;
+            loadRepairReports();
+        });
+    });
+
+    function loadRepairReports() {
+        const dormName = document.getElementById('dormitory').value;
+        const date = document.getElementById('date').value;
+        const repairtype = document.getElementById('repairtype-dropdown').value;
+
+        let url = '/admin/api/reports?dormName=' + encodeURIComponent(dormName);
+        if (date) url += '&date=' + encodeURIComponent(date);
+        if (repairtype) url += '&repairtype=' + encodeURIComponent(repairtype);
+
+        if (currentSearchType === 'all') {
+            const search = document.getElementById('search-all')?.value.trim();
+            if (search) url += '&search=' + encodeURIComponent(search) + '&searchType=all';
+        } else if (currentSearchType === 'article') {
+            const search = document.getElementById('search-article')?.value.trim();
+            if (search) url += '&search=' + encodeURIComponent(search) + '&searchType=article';
+        } else if (currentSearchType === 'nameroom') {
+            const search = document.getElementById('search-nameroom')?.value.trim();
+            if (search) url += '&search=' + encodeURIComponent(search) + '&searchType=nameroom';
+        }
+
+        fetch(url)
+            .then(res => {
+                if (!res.ok) throw new Error('No reports found.');
+                return res.json();
+            })
+            .then(data => {
+                createReportCards(data);
+            })
+            .catch(err => {
+                const container = document.getElementById("card-container");
+                container.innerHTML = `<div class="alert alert-info">${err.message}</div>`;
+            });
+    }
+
+    function createReportCards(reports) {
+        const container = document.getElementById("card-container");
+        container.innerHTML = "";
+        if (!reports || reports.length === 0) {
+            container.innerHTML = '<div class="alert alert-info">No reports found.</div>';
+            return;
+        }
+        const row = document.createElement("div");
+        row.className = "row g-4";
+        reports.forEach(report => {
+            const col = document.createElement("div");
+            col.className = "col-md-6";
+            const card = document.createElement("div");
+            card.className = "card shadow-sm report-card " + (report.status ? report.status.toLowerCase() : '');
+            let imageSrc = report.image || '';
+            if (imageSrc.startsWith('uploads/')) imageSrc = '/public/' + imageSrc;
+            if (!imageSrc) imageSrc = '/public/img/no-image.png';
+            card.innerHTML = `
+                <div class="row g-0 ">
+                    <div class="col-5">
+                        <img src="${imageSrc}" alt="Image" class="img-fluid report-image">
+                    </div>
+                    <div class="col-7 p-3">
+                        <p class="mb-1"><strong>Name:</strong> ${report.student_name || '-'}</p>
+                        <p class="mb-1"><strong>Dormitory:</strong> ${report.dorm || '-'}</p>
+                        <p class="mb-1"><strong>Room:</strong> ${report.room_number || '-'}</p>
+                        <p class="mb-1"><strong>Request Date:</strong> ${formatDate(report.request_date)}</p>
+                        <p class="mb-1"><strong>Repair Type:</strong> ${report.category_name || '-'}</p>
+                        <p class="mb-1"><strong>Item:</strong> ${report.article || '-'}</p>
+                        <p class="mb-1"><strong>Damage Description:</strong> ${report.description || '-'}</p>
+                        <span class="report-status">${report.status}</span>
+                    </div>
+                </div>
+            `;
+            col.appendChild(card);
+            row.appendChild(col);
+        });
+        container.appendChild(row);
+    }
+
+    function formatDate(dateStr) {
+        if (!dateStr) return '-';
+        const date = new Date(dateStr);
+        if (isNaN(date)) return dateStr;
+        let hours = date.getHours();
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const year = date.getFullYear();
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12;
+        const hourStr = hours.toString().padStart(2, '0');
+        return `${day}/${month}/${year}, ${hourStr}:${minutes} ${ampm}`;
+    }
+</script>
+</body>
+
+</html>

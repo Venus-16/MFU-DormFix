@@ -1,0 +1,140 @@
+/* Tech_Repair.css */
+
+body {
+    background-color: #f8f9fa;
+}
+
+.repair-container {
+    margin-top: 90px;
+    /* เพื่อไม่ให้ทับกับ Navbar */
+    padding-bottom: 100px;
+    /* กัน Tabbar ทับ */
+}
+
+.repair-card {
+    background-color: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: box-shadow 0.3s ease;
+    height: 100%;
+    width: 75%;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.repair-card img {
+    height: 160px;
+    width: 100%;
+    object-fit: cover;
+}
+
+.repair-card .card-body {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+@media (max-width: 576px) {
+    .repair-card img {
+        height: 120px;
+    }
+
+    .repair-container {
+        margin-top: 70px;
+        padding-bottom: 80px;
+    }
+}
+
+.modal-content {
+    background-color: #f9f9f9;
+}
+
+.modal-body table {
+    border: 1px solid #5e5959;
+    /* สีเทา */
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.modal-body th,
+.modal-body td {
+    border: 1px solid #5e5959;
+    /* เพิ่มเส้นรอบเซลล์ */
+    padding: 10px 15px;
+    vertical-align: middle;
+}
+
+.modal-body th {
+    background-color: #524d4d;
+    font-weight: 600;
+    width: 40%;
+}
+
+/* เพิ่ม z-index ให้กับ photo modal */
+#photoModal {
+    z-index: 1060;
+
+}
+
+/* ปรับแต่ง modal backdrop ถ้าจำเป็น */
+.modal-backdrop {
+    z-index: 1040;
+
+}
+
+/* ถ้ามีหลาย backdrop ให้ปรับเพิ่ม */
+.modal-backdrop+.modal-backdrop {
+    z-index: 1041;
+}
+
+/* Add this to /css/Tech_Repair.css */
+.photo-modal-img {
+    cursor: zoom-in;
+    transition: transform 0.2s;
+}
+
+.photo-modal-img.zoomed {
+    cursor: zoom-out;
+    transform: scale(2);
+    z-index: 1000;
+}
+
+#photoModal .modal-body {
+    overflow: auto;
+}
+
+/* Default: desktop ใช้ width 75% */
+.repair-card {
+    width: 75%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* iPad หรือ Tablet แนวนอน (หน้าจอ 768px - 1199.98px) ให้กว้างขึ้นเป็น 95% */
+@media (min-width: 768px) and (max-width: 1199.98px) {
+    .repair-card {
+        width: 95%;
+    }
+
+    body.sidebar-open .repair-container {
+        margin-left: 150px;
+    }
+}
+
+/* มือถือ (ต่ำกว่า 768px) เต็ม 100% */
+@media (max-width: 767.98px) {
+    .repair-card {
+        width: 100%;
+    }
+
+    body.sidebar-open .repair-container {
+        margin-left: 150px;
+    }
+}
+
+@media (min-width: 992px) {
+    .repair-container {
+        margin-left: 150px;
+    }
+}

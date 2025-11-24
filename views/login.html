@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="/public/img/MFU.png" type="image/x-icon">
+    <title>Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body,
+        html {
+            height: 100%;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            flex-direction: row;
+        }
+
+        .left {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            background: #fff;
+        }
+
+        .left img.logo {
+            width: 80px;
+            margin-bottom: 1rem;
+        }
+
+        .title {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .title span:first-child {
+            color: #d32f2f;
+            font-weight: bold;
+        }
+
+        .title span:last-child {
+            color: #bfa048;
+            font-weight: bold;
+        }
+
+        .form {
+            width: 100%;
+            max-width: 350px;
+            display: flex;
+            flex-direction: column;
+
+        }
+
+        .form label {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .form input {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1.5rem;
+            border: none;
+            background: #eee;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .form .password-wrapper {
+            position: relative;
+        }
+
+        .form .password-wrapper input {
+            padding-right: 2.5rem;
+        }
+
+        .form .password-wrapper .toggle-password {
+            position: absolute;
+            top: 40%;
+            right: 10px;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 0.75rem;
+            font-size: 1.2rem;
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .first-time {
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .first-time a {
+            font-size: 0.95rem;
+            color: gray;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .first-time a:hover {
+            color: black;
+            text-decoration: underline;
+        }
+
+
+        .right {
+            flex: 1;
+            background: url('/public/img/Login.jpg') no-repeat center center;
+            background-size: cover;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .right {
+                height: 40vh;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="left">
+            <img src="/public/img/MFU.png" alt="MFU Logo" class="logo">
+            <div class="title">
+                <span>MFU</span> <span>DormFix</span>
+            </div>
+            <div class="form">
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="Enter your email">
+
+                <label for="password">Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="password" placeholder="Enter your password">
+                    <i class="fa fa-eye-slash toggle-password" id="togglePassword"></i>
+                </div>
+
+                <button class="login-button" id="login-btn">Login</button>
+
+
+
+
+            </div>
+
+            <div id="error-message" style="color: red; font-size: 0.95rem; margin-bottom: 1rem;"></div>
+            <div class="first-time">
+                <a href="/set_password" id="set-password-link">First time login? Set your password here</a>
+            </div>
+
+
+        </div>
+        <div class="right"></div>
+    </div>
+
+    <script src="/public/js/login.js"></script>
+
+</body>
+
+</html>

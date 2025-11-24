@@ -1,0 +1,346 @@
+/* ========== Search Type Section & Buttons ========== */
+.search-type-section {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 12px;
+}
+
+.search-type-btn-group {
+    display: flex;
+    flex-wrap: nowrap !important;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.search-type-btn {
+    display: inline-block;
+    padding: 0.4em 1.5em;
+    min-width: unset;
+    margin-right: 0;
+    margin-bottom: 0;
+    white-space: nowrap;
+    border-radius: 1.8rem;
+    font-size: 1.05rem;
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s, border 0.2s;
+    border: 1.5px solid #d0cde1;
+    background: #f8f9fa;
+    color: #495057;
+    line-height: 1.2;
+}
+
+.search-type-btn.active,
+.search-type-btn:focus {
+    background: #9379C2 !important;
+    color: #fff !important;
+    border-color: #9379C2 !important;
+}
+
+.search-type-btn:disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+#search-bar-wrapper {
+    width: 100%;
+    min-width: 180px;
+}
+
+.search-input-area {
+    display: none;
+}
+
+.show-all .search-input-all,
+.show-article .search-input-article,
+.show-name-room .search-input-nameroom {
+    display: block;
+}
+
+.repairtype-select {
+    min-width: 170px;
+    max-width: 210px;
+    border-radius: 1.5rem;
+    font-size: 1rem;
+    border: 1.5px solid #d0cde1;
+    padding: 0.25rem 1.5rem 0.25rem 0.75rem;
+    background: #f8f9fa;
+    margin-left: 0.5rem;
+}
+
+/* Loader overlay styles - covers only main-content-area */
+#loading-overlay {
+    position: absolute;
+    /* Place overlay below the navbar/tabbar */
+    top: 48px;
+    /* Change this value to match your navbar height */
+    left: 0;
+    width: 100%;
+    height: calc(100vh - 56px);
+    /* Overlay only the area below navbar/tabbar */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.85);
+    z-index: 9999;
+}
+
+/* Prevent loader overlay from inheriting global font styles */
+#loading-overlay,
+#loading-overlay * {
+    font-family: inherit !important;
+    font-weight: inherit !important;
+    color: inherit !important;
+}
+
+/* Loader content styles */
+#loading-overlay .loader-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#loading-overlay .loader-content .loading-icon {
+    width: 64px;
+    height: 64px;
+    background: url("/public/img/loader-hourglass.svg") no-repeat center/contain;
+    margin-bottom: 16px;
+}
+
+#loading-overlay .loader-content .loading-text {
+    font-size: 1.3em;
+    color: #444;
+    letter-spacing: 2px;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+#main-content-area {
+    position: relative;
+    min-height: 10vh;
+}
+
+/* ========== Layout ========== */
+body {
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+    transition: margin-left 0.3s ease;
+}
+
+.main-content {
+    margin-left: 150px;
+    padding: 20px;
+    width: calc(100% - 200px);
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+body.sidebar-collapsed .main-content {
+    margin-left: 50px;
+    width: calc(100% - 70px);
+}
+
+.report-card {
+    border-radius: 12px;
+    padding: 20px;
+    max-width: 600px;
+    width: 100%;
+    font-size: 0.85rem;
+    line-height: 1.8;
+    margin: 0 auto;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+    overflow: hidden;
+}
+
+.report-card.pending {
+    background-color: #E7E4E8;
+}
+
+.report-image {
+    width: 100%;
+    height: 100%;
+    max-height: 180px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.report-status {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 6px 20px;
+    border-radius: 20px;
+    background-color: #f0ad00;
+    color: white;
+    font-weight: 600;
+    font-size: 0.85rem;
+    width: 100px;
+    text-align: center;
+}
+
+#card-container {
+    width: 100%;
+}
+
+/* ========== Responsive ========== */
+@media (max-width: 768px) {
+    .main-content {
+        margin-left: 120px;
+        /* เพิ่มจาก 100px เป็น 120px */
+        width: calc(100% - 120px) !important;
+        /* ปรับความกว้างลดลงตาม margin */
+        padding: 15px;
+    }
+
+    body.sidebar-collapsed .main-content {
+        margin-left: 50px;
+        width: 100% !important;
+    }
+
+    #loading-overlay {
+        top: 48px;
+        left: 50px !important;
+        height: calc(100vh - 48px);
+    }
+
+    #main-content-area {
+        position: relative;
+        min-height: 10vh;
+    }
+
+    .main-content .card {
+        width: 100%;
+        padding: 10px;
+    }
+
+    .main-content .row {
+        flex-direction: column;
+    }
+
+    .search-type-section {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 0.5rem;
+    }
+
+    .search-type-btn-group {
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .main-content .col-7,
+    .main-content .col-5 {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .input-group {
+        flex-wrap: nowrap !important;
+    }
+
+    .input-group .input-group-text {
+        white-space: nowrap !important;
+        display: flex !important;
+        align-items: center;
+        width: 30px !important;
+    }
+
+    .input-group-text i {
+        padding-left: 6px !important;
+    }
+
+    .search-type-section label {
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .search-type-section input,
+    .search-type-section select,
+    .search-type-section button {
+        width: 100%;
+        font-size: 0.9rem;
+        padding: 8px 12px;
+        box-sizing: border-box;
+    }
+
+    .search-type-btn-group button {
+        width: auto;
+        font-size: 0.9rem;
+        padding: 8px 16px;
+    }
+
+    .main-content img {
+        max-height: 150px !important;
+        width: 100% !important;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    .report-card {
+        font-size: 0.75rem;
+        line-height: 1.5;
+    }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+
+    /* สำหรับ iPhone ทุกขนาดแนวนอน */
+    #loading-overlay {
+        top: 48px;
+        left: 10px !important;
+        height: calc(100vh - 48px);
+    }
+}
+
+@media (max-width: 1024px) {
+    #loading-overlay {
+        top: 48px;
+        left: 50px;
+        height: calc(100vh - 48px);
+    }
+
+    h2 {
+        font-size: 20px;
+        padding-top: 10px;
+    }
+
+    select {
+        width: 200px !important;
+    }
+
+    .main-content .card {
+        width: 250px;
+        padding: 15px;
+    }
+
+    .main-content .col-7,
+    .main-content .col-5 {
+        width: 100%;
+    }
+
+    .main-content img {
+        max-height: 200px !important;
+        width: 100% !important;
+        object-fit: cover;
+        border-radius: 10px;
+    }
+
+    .main-content span {
+        width: 100% !important;
+        padding: 8px 0 !important;
+    }
+}
+
+@media (min-width: 900px) and (max-width: 1400px) and (orientation: landscape) {
+
+    /* สำหรับ iPad, Tablet ทุกขนาดแนวนอน */
+    #loading-overlay {
+        top: 48px;
+        left: 42px;
+        height: calc(100vh - 48px);
+    }
+}

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Technician History</title>
+    <link rel="shortcut icon" href="/public/img/MFU.png" type="image/x-icon">
+    <link rel="stylesheet" href="/public/css/Tech/Tech_Nav.css" />
+    <link rel="stylesheet" href="/public/css/Tech/Tech_History.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        .main-content {
+            position: relative;
+        }
+
+        #content-loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #fffbe9e0;
+            z-index: 99;
+            display: none;
+            align-items: flex-start;
+            justify-content: center;
+        }
+
+        .center-loader-container {
+            position: relative;
+            left: 0;
+            top: 0;
+            transform: none;
+            margin-top: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        .loader-visual {
+            --c1: #673b14;
+            --c2: #f8b13b;
+            width: 40px;
+            height: 80px;
+            border-top: 4px solid var(--c1);
+            border-bottom: 4px solid var(--c1);
+            background: linear-gradient(90deg, var(--c1) 2px, var(--c2) 0 5px, var(--c1) 0) 50%/7px 8px no-repeat;
+            display: grid;
+            overflow: hidden;
+            animation: l5-0 2s infinite linear;
+        }
+
+        .loader-visual::before,
+        .loader-visual::after {
+            content: "";
+            grid-area: 1/1;
+            width: 75%;
+            height: calc(50% - 4px);
+            margin: 0 auto;
+            border: 2px solid var(--c1);
+            border-top: 0;
+            box-sizing: content-box;
+            border-radius: 0 0 40% 40%;
+            -webkit-mask:
+                linear-gradient(#000 0 0) bottom/4px 2px no-repeat,
+                linear-gradient(#000 0 0);
+            -webkit-mask-composite: destination-out;
+            mask-composite: exclude;
+            background:
+                linear-gradient(var(--d, 0deg), var(--c2) 50%, #0000 0) bottom /100% 205%,
+                linear-gradient(var(--c2) 0 0) center/0 100%;
+            background-repeat: no-repeat;
+            animation: inherit;
+            animation-name: l5-1;
+        }
+
+        .loader-visual::after {
+            transform-origin: 50% calc(100% + 2px);
+            transform: scaleY(-1);
+            --s: 3px;
+            --d: 180deg;
+        }
+
+        @keyframes l5-0 {
+            80% {
+                transform: rotate(0)
+            }
+
+            100% {
+                transform: rotate(0.5turn)
+            }
+        }
+
+        @keyframes l5-1 {
+
+            10%,
+            70% {
+                background-size: 100% 205%, var(--s, 0) 100%
+            }
+
+            70%,
+            100% {
+                background-position: top, center
+            }
+        }
+
+        .loader-text {
+            width: fit-content;
+            font-weight: bold;
+            font-family: monospace;
+            font-size: 30px;
+            clip-path: inset(0 3ch 0 0);
+            animation: l4 1s steps(4) infinite;
+            color: #673b14;
+            background: #fffbe9;
+            padding: 0.5em 1em;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px #f8b13b33;
+            margin-top: 32px;
+        }
+
+        .loader-text:before {
+            content: "Loading...";
+        }
+
+        @keyframes l4 {
+            to {
+                clip-path: inset(0 -1ch 0 0)
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="navbar-placeholder"></div>
+
+    <div class="d-flex" style="flex: 1;">
+        <div id="sidebar"></div>
+
+        <div class="main-content">
+            <!-- Loading overlay for content only -->
+            <div id="content-loading-overlay"></div>
+            <div class="container">
+                <h2>History</h2>
+
+                <!-- Search and Filter -->
+                <div class="d-flex flex-wrap gap-2 my-3" id="search-filter-buttons">
+                    <button class="btn btn-outline-secondary active" id="btn-search-date"
+                        onclick="showSearch('date', this)">Repair
+                        request date</button>
+                    <button class="btn btn-outline-secondary" id="btn-search-name"
+                        onclick="showSearch('name', this)">Requestor
+                        name</button>
+                    <button class="btn btn-outline-secondary" id="btn-search-issue"
+                        onclick="showSearch('issue', this)">Details
+                        of the
+                        repair issue</button>
+                    <button class="btn btn-outline-primary" id="btn-search-all"
+                        onclick="showAllRequests(); setActiveFilterButton(this);">Show All</button>
+                </div>
+
+                <!-- Date + Dormitory dropdown side by side -->
+                <div class="mb-3 d-flex align-items-end gap-3" id="search-date">
+                    <div>
+                        <label>Repair request date</label>
+                        <input type="date" class="form-control ps-5 rounded-pill" style="max-width: 150px;"
+                            id="dateSearchInput" onchange="filterByDate()" />
+                    </div>
+                    <div>
+                        <label>Dormitory</label>
+                        <select class="form-select rounded-pill" style="max-width: 200px;" id="dormitoryFilter"
+                            onchange="filterByDormitory()">
+                            <option value="">All Dormitories</option>
+                            <!-- Dormitory options will be loaded by JS -->
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-3 position-relative d-none" id="search-name">
+                    <label>Requestor name</label>
+                    <input type="text" class="form-control ps-5 rounded-pill" placeholder="Search by name..."
+                        style="max-width: 200px;" id="nameSearchInput" oninput="filterByName()" />
+                    <i class="fa fa-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                </div>
+
+                <div class="mb-3 position-relative d-none" id="search-issue">
+                    <label>Details of the repair issue</label>
+                    <input type="text" class="form-control ps-5 rounded-pill" placeholder="Search by issue..."
+                        style="max-width: 200px;" id="issueSearchInput" oninput="filterByIssue()" />
+                    <i class="fa fa-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                </div>
+
+                <div id="card-container" class="d-flex flex-column gap-4 mt-4"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/public/js/Tech/Tech_History.js"></script>
+    <script src="/public/js/Tech/Tech.navbar-notification.js"></script>
+    <script>
+        // Show content loading overlay (call this while loading data)
+        async function showContentLoading() {
+            const overlay = document.getElementById('content-loading-overlay');
+            if (!overlay) return;
+            overlay.style.display = 'flex';
+            try {
+                const res = await fetch('/loading');
+                const html = await res.text();
+                // ดึงเฉพาะ .center-loader-container ไม่ใช่ทั้ง html
+                const temp = document.createElement('div');
+                temp.innerHTML = html;
+                const loader = temp.querySelector('.center-loader-container');
+                overlay.innerHTML = loader ? loader.outerHTML : "<div>Loading...</div>";
+            } catch (e) {
+                overlay.innerHTML = '<div style="color:#c00; font-size:1.5rem">Loading...</div>';
+            }
+        }
+        function hideContentLoading() {
+            const overlay = document.getElementById('content-loading-overlay');
+            if (!overlay) return;
+            overlay.style.opacity = '0';
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                overlay.innerHTML = '';
+                overlay.style.opacity = '1';
+            }, 400);
+        }
+
+        // Example usage: show overlay on load, then hide after data loaded
+        document.addEventListener("DOMContentLoaded", function () {
+            showContentLoading();
+            // Simulate loading, replace with your real data fetch and hide when done
+            setTimeout(hideContentLoading, 1000);
+        });
+
+        // UI: Switch search filter
+        function showSearch(type, btn) {
+            // Remove active from all
+            document.querySelectorAll('#search-filter-buttons button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            // Hide all search sections
+            document.getElementById('search-date').classList.add('d-none');
+            document.getElementById('search-name').classList.add('d-none');
+            document.getElementById('search-issue').classList.add('d-none');
+
+            // Show the one needed
+            if (type === 'date') {
+                document.getElementById('search-date').classList.remove('d-none');
+            } else if (type === 'name') {
+                document.getElementById('search-name').classList.remove('d-none');
+            } else if (type === 'issue') {
+                document.getElementById('search-issue').classList.remove('d-none');
+            }
+        }
+        function setActiveFilterButton(btn) {
+            document.querySelectorAll('#search-filter-buttons button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+        function showAllRequests() {
+            // Clear all filters and reload
+            document.getElementById('dateSearchInput').value = "";
+            document.getElementById('dormitoryFilter').value = "";
+            document.getElementById('nameSearchInput').value = "";
+            document.getElementById('issueSearchInput').value = "";
+            // reload data
+            if (typeof filterAndRender === "function") filterAndRender();
+        }
+        // Default: show date filter on load
+        window.addEventListener('DOMContentLoaded', () => {
+            showSearch('date', document.getElementById('btn-search-date'));
+        });
+    </script>
+</body>
+
+</html>

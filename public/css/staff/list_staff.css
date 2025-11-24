@@ -1,0 +1,172 @@
+/* Table header styling */
+.custom-table thead th {
+    background-color: #FF7C7C !important;
+    color: black !important;
+}
+
+/* Main content area */
+.main-content {
+    margin-left: 160px;
+    width: calc(100% - 200px);
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+body.sidebar-collapsed .main-content {
+    margin-left: 120px;
+}
+
+/* Search button active states */
+#search-name-id-btn.active,
+#search-room-btn.active {
+    background-color: #FF7C7C;
+    color: #fff;
+    border-color: #FF7C7C;
+}
+
+/* Wider search box */
+#search {
+    max-width: 220px;
+    min-width: 120px;
+}
+
+@media (max-width: 600px) {
+    #search {
+        max-width: 160px;
+    }
+}
+
+/* Loader overlay and main content area */
+#main-content-area {
+    position: relative;
+    min-height: 10vh;
+}
+
+/* Default: Desktop & Tablet */
+#loading-overlay {
+    position: absolute;
+    top: 48px;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 251, 233, 0.7);
+    z-index: 9999;
+}
+
+/* Loader content styles */
+#loading-overlay .loader-content {
+    padding: 2rem 3rem;
+    border-radius: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Prevent loader overlay from inheriting global font styles */
+#loading-overlay,
+#loading-overlay * {
+    font-family: inherit !important;
+    font-weight: inherit !important;
+    color: inherit !important;
+}
+
+/* Loader icon */
+#loading-overlay .loader-content .loading-icon {
+    width: 64px;
+    height: 64px;
+    background: url("/public/img/loader-hourglass.svg") no-repeat center/contain;
+    margin-bottom: 16px;
+}
+
+/* Loader text */
+#loading-overlay .loader-content .loading-text {
+    font-size: 2.3rem;
+    color: #8d6e3a;
+    font-family: 'Prompt', 'Kanit', Arial, sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+}
+
+/* Prevent scroll when loading */
+body.loading-active {
+    overflow: hidden !important;
+    position: fixed;
+    width: 100%;
+}
+
+/* Tablet (iPad) specific adjustments */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .main-content {
+        margin-left: 130px;
+        width: calc(100% - 140px);
+        padding: 20px;
+    }
+
+    body.sidebar-collapsed .main-content {
+        margin-left: 50px;
+        width: calc(100% - 80px);
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .custom-table thead th {
+        font-size: 1rem;
+        padding: 10px 12px;
+    }
+
+    .custom-table tbody td {
+        font-size: 0.9rem;
+        padding: 8px 12px;
+    }
+
+    /* Loader overlay stays fixed */
+    #loading-overlay {
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+    }
+}
+
+/* Mobile specific adjustments */
+@media (max-width: 767px) {
+    #loading-overlay {
+        top: 0;
+        left: 50px;
+        width: 100vw;
+        height: 100vh;
+    }
+
+    .main-content {
+        margin-left: 110px;
+        width: calc(100% - 120px) !important;
+        padding: 15px;
+    }
+
+    body.sidebar-collapsed .main-content {
+        margin-left: 50px;
+        width: 100% !important;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .custom-table thead th {
+        font-size: 0.8rem;
+        padding: 8px 6px;
+    }
+}
+
+/* Example table responsive for all screens */
+.table-wrapper,
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}

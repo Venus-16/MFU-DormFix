@@ -1,0 +1,171 @@
+body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    /* จัดแนวนอน */
+    align-items: center;
+    /* จัดแนวตั้ง */
+    background-image: url('/public/img/mfu.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    font-family: Arial, sans-serif;
+}
+
+.card {
+    width: 900px;
+    padding: 0;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+    /* ป้องกันหลุดขอบโค้ง */
+}
+
+.left-panel {
+    background-color: #d3d3d3;
+    width: 35%;
+    /* ปรับตามต้องการ */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.right-panel {
+    width: 65%;
+    padding: 40px;
+}
+.value {
+    font-size: 20px;
+}
+.label {
+    font-size: 20px;
+    font-weight: bold;
+    /* ทำให้ตัวอักษรหนา */
+}
+
+#head {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+#content {
+    color: #979797;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* ปรับ layout ปกติ */
+.container {
+    transition: margin-left 0.3s ease;
+    margin-left: 160px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: calc(100vw - 160px);
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.sidebar-collapsed .container {
+    margin-left: 0 !important;
+    width: 100vw;
+}
+
+@media (max-width: 767px) {
+    .sidebar-collapsed .container {
+        margin-left: 50px !important;
+    }
+
+    .card {
+        flex-direction: column;
+        width: 90%;
+    }
+
+    .left-panel,
+    .right-panel {
+        width: 100%;
+        padding: 20px;
+    }
+
+    .right-panel {
+        padding-top: 0;
+        text-align: center;
+    }
+
+    .container {
+        margin-left: 100px !important;
+        width: 100%;
+        padding: 20px;
+    }
+
+    #imagp img {
+        width: 120px;
+        height: 120px;
+    }
+
+    .buttom {
+        width: 100px;
+        font-size: 0.6rem;
+    }
+
+    #head,
+    #content {
+        font-size: 1rem;
+        text-align: center;
+    }
+}
+
+/* เวอร์ชัน iPad/Tablet */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .card {
+        width: 80%;
+        /* ลดความกว้างลงจาก 900px */
+        flex-direction: row;
+        /* แนวนอนเหมือนเดิม */
+    }
+
+    .left-panel {
+        width: 40%;
+        /* ขยายขึ้นเล็กน้อยจาก 35% */
+        padding: 20px;
+    }
+
+    .right-panel {
+        width: 60%;
+        /* ลดลงจาก 65% */
+        padding: 30px;
+    }
+
+    #imagp img {
+        width: 130px;
+        height: 130px;
+    }
+
+    .buttom {
+        width: 130px;
+        font-size: 0.9rem;
+    }
+
+    #head,
+    #content {
+        font-size: 1.2rem;
+    }
+
+    .container {
+        margin-left: 160px;
+        /* ถ้ามี sidebar ให้เว้นขอบไว้เหมือน desktop */
+        width: calc(100vw - 160px);
+        padding: 20px;
+    }
+
+    /* ถ้าซ่อน sidebar */
+    .sidebar-collapsed .container {
+        margin-left: 0;
+        width: 100vw;
+    }
+}

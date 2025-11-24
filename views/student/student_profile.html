@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="shortcut icon" href="/public/img/MFU.png" type="image/x-icon" />
+    <title>Profile</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: url('/public/img/background.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #D4AF37;
+            /* darker rich brown text */
+        }
+
+        .profile-wrapper {
+            backdrop-filter: blur(12px);
+            background-color: rgba(255, 255, 255, 0.75);
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .gold-text {
+            color: #917313;
+
+        }
+
+        .gold-icon {
+            color: #b6921e;
+        }
+
+        .avatar-section {
+            background-color: #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            border-radius: 1.5rem 0 0 1.5rem;
+        }
+
+        .avatar-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 180px;
+            height: 180px;
+            border: 5px solid #5c1000;
+            border-radius: 50%;
+            background-color: white;
+            box-shadow: 0 4px 12px rgba(92, 16, 0, 0.4);
+            transition: transform 0.3s ease;
+            font-size: 100px;
+            line-height: 1;
+            padding: 0;
+            color: #5c1000;
+        }
+
+        .avatar-icon:hover {
+            transform: scale(1.05);
+        }
+
+        .profile-wrapper .text-lg {
+            font-size: 1.25rem;
+            /* ~20px */
+            font-weight: 400;
+            line-height: 1.6;
+            letter-spacing: 0.02em;
+            color: #D4AF37;
+        }
+
+        @media (max-width: 768px) {
+            .avatar-section {
+                border-radius: 1.5rem 1.5rem 0 0;
+            }
+
+            .profile-wrapper {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="navbar-container"></div>
+
+    <section class="flex items-center justify-center min-h-screen px-4 py-16">
+        <div class="w-full max-w-4xl flex profile-wrapper overflow-hidden">
+            <!-- Left: Avatar -->
+            <div class="avatar-section">
+                <i class="fa-solid fa-user gold-icon avatar-icon"></i>
+            </div>
+
+            <!-- Right: Info -->
+            <div class="flex-1 p-8 space-y-5 text-lg">
+                <div id="profileInfo">
+                    <p>Loading profile...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Scripts (unchanged) -->
+    <script>
+        // Load Navbar HTML
+        fetch("/views/student/student_navbar.html")
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById("navbar-container").innerHTML = html;
+
+                // Wait until navbar is in DOM
+                setTimeout(() => {
+                    // ====== Elements ======
+                    const userBtn = document.getElementById("userBtn");
+                    const userDropdown = document.getElementById("userDropdown");
+                    const notificationBtn = document.getElementById("notificationBtn");
+                    const notificationDropdown = document.getElementById("notificationDropdown");
+                    const logoutModal = document.getElementById("logoutModal");
+                    const cancelLogout = document.getElementById("cancelLogout");
+                    const badge = document.getElementById("notificationCount");
+                    const allTab = document.getElementById("allTab");
+                    const unreadTab = document.getElementById("unreadTab");
+
+                    let currentTab = "all";
+
+                    // ====== Load student name ======
+                    fetch("/student/info")
+                        .then(res => res.json())
+                        .then(info => {
+                            document.getElementById("studentName").innerText = info.name;
+                        })
+                        .catch(() => {
+                            document.getElementById("studentName").innerText = "Student";
+                        });
+
+                    fetchNotifications();
+
+                    // ====== Dropdown Toggle ======
+                    userBtn?.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        notificationDropdown?.classList.add("hidden");
+                        userDropdown?.classList.toggle("hidden");
+                    });
+
+                    notificationBtn?.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        userDropdown?.classList.add("hidden");
+                        notificationDropdown?.classList.toggle("hidden");
+                        fetchNotifications(); // fetch when clicked
+                    });
+
+                    document.addEventListener("click", (event) => {
+                        if (!userDropdown.contains(event.target) && !userBtn.contains(event.target)) {
+                            userDropdown.classList.add("hidden");
+                        }
+                        if (!notificationDropdown.contains(event.target) && !notificationBtn.contains(event.target)) {
+                            notificationDropdown.classList.add("hidden");
+                        }
+                    });
+
+                    // ====== Logout Modal ======
+                    const logoutBtn = document.querySelector("#userDropdown button");
+                    logoutBtn?.addEventListener("click", () => {
+                        logoutModal?.classList.remove("hidden");
+                        logoutModal?.classList.add("flex");
+                    });
+
+                    cancelLogout?.addEventListener("click", () => {
+                        logoutModal?.classList.remove("flex");
+                        logoutModal?.classList.add("hidden");
+                    });
+
+                    // ====== Fetch Notifications ======
+                    // ====== Tabs ======
+                    function setActiveTab(tab) {
+                        if (tab === "all") {
+                            allTab.className = "px-3 py-1 text-sm rounded-full font-medium bg-blue-600 text-white";
+                            unreadTab.className = "px-3 py-1 text-sm rounded-full font-medium bg-gray-200 text-gray-700 hover:bg-gray-300";
+                        } else {
+                            unreadTab.className = "px-3 py-1 text-sm rounded-full font-medium bg-blue-600 text-white";
+                            allTab.className = "px-3 py-1 text-sm rounded-full font-medium bg-gray-200 text-gray-700 hover:bg-gray-300";
+                        }
+                    }
+
+                    allTab?.addEventListener("click", () => {
+                        currentTab = "all";
+                        setActiveTab("all");
+                        fetchNotifications();
+                    });
+
+                    unreadTab?.addEventListener("click", () => {
+                        currentTab = "unread";
+                        setActiveTab("unread");
+                        fetchNotifications();
+                    });
+
+                    const markAllReadBtn = document.getElementById("markAllRead");
+                    markAllReadBtn?.addEventListener("click", async () => {
+                        await fetch("/notifications/read-all", { method: "POST" });
+                        fetchNotifications();
+                    });
+
+                    function formatDateTime(dateString) {
+                        const date = new Date(dateString);
+
+                        // Format: DD/MM/YY HH:mm
+                        const day = String(date.getDate()).padStart(2, '0');
+                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                        const year = String(date.getFullYear()).slice(-2);
+                        const hours = String(date.getHours()).padStart(2, '0');
+                        const minutes = String(date.getMinutes()).padStart(2, '0');
+
+                        return `${day}/${month}/${year} ${hours}:${minutes}`;
+                    }
+
+
+                    // Icon mapping by notification title
+                    const iconMap = {
+                        "Repair Request Confirmed": { icon: "fa-wrench", color: "text-blue-500" },
+                        "Repair Request Updated": { icon: "fa-edit", color: "text-yellow-500" },
+                        "Repair Completed": { icon: "fa-check-circle", color: "text-green-500" }
+                    };
+
+                    async function fetchNotifications() {
+                        try {
+                            const res = await fetch('/student/notifications');
+                            if (!res.ok) throw new Error('Failed to fetch notifications');
+                            const data = await res.json();
+
+                            const list = document.querySelector('#notificationDropdown ul');
+                            const badge = document.getElementById('notificationCount');
+                            list.innerHTML = '';
+
+                            if (!data || data.length === 0) {
+                                list.innerHTML = `<li class="px-4 py-2 text-sm text-gray-500">No new notifications</li>`;
+                                badge.classList.add('hidden');
+                                return;
+                            }
+
+                            // ✅ Apply filter by tab
+                            let filtered = data;
+                            if (currentTab === "unread") {
+                                filtered = data.filter(n => n.is_read === 0);
+                            }
+
+                            if (filtered.length === 0) {
+                                list.innerHTML = `<li class="px-4 py-2 text-sm text-gray-500">No notifications</li>`;
+                                return;
+                            }
+
+                            filtered.forEach(noti => {
+                                // Pick icon from mapping, default to bell
+                                const { icon, color } = iconMap[noti.title] || { icon: "fa-bell", color: "text-gray-500" };
+
+                                const li = document.createElement('li');
+                                li.className =
+                                    "px-4 py-2 text-sm border-b cursor-pointer flex items-start space-x-3 " +
+                                    (noti.is_read === 0
+                                        ? "bg-gray-200 font-semibold text-red-600 hover:bg-gray-300"
+                                        : "bg-white text-gray-600 hover:bg-gray-100");
+
+                                li.innerHTML = `
+                <i class="fas ${icon} ${color} mt-1"></i>
+                <div class="flex-1">
+                    <div class="font-semibold">${noti.title}</div>
+                    <div class="text-xs text-gray-500">${noti.message || ''}</div>
+                    <div class="text-[10px] text-gray-400">${formatDateTime(noti.created_at)}</div>
+                </div>
+            `;
+
+                                li.addEventListener('click', async () => {
+                                    if (noti.link) window.location.href = noti.link;
+
+                                    await fetch('/notifications/read', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ notification_id: noti.notification_id })
+                                    });
+
+                                    fetchNotifications();
+                                });
+
+                                list.appendChild(li);
+                            });
+
+                            // Update badge count
+                            const unreadCount = data.filter(n => n.is_read === 0).length;
+                            if (unreadCount > 0) {
+                                badge.textContent = unreadCount;
+                                badge.classList.remove('hidden');
+                            } else {
+                                badge.classList.add('hidden');
+                            }
+                        } catch (err) {
+                            console.error(err);
+                        }
+                    }
+
+                    // Auto refresh every 30s
+                    setInterval(fetchNotifications, 30000);
+                }, 0);
+            });
+
+        fetch("/student/profile-data")
+            .then(res => {
+                if (!res.ok) throw new Error("Unauthorized or failed");
+                return res.json();
+            })
+            .then(data => {
+                const profileHTML = `
+                <p><i class="fa-solid fa-id-badge mr-3 gold-icon"></i>
+                    <span class="font-semibold gold-text">Student ID:</span> ${data.student_id}</p>
+                <p><i class="fa-solid fa-user mr-3 gold-icon"></i>
+                    <span class="font-semibold gold-text">Name:</span> ${data.name}</p>
+                <p><i class="fa-solid fa-school mr-3 gold-icon"></i>
+                    <span class="font-semibold gold-text">School:</span> ${data.school_name}</p>
+                <p><i class="fa-solid fa-laptop-code mr-3 gold-icon"></i>
+                    <span class="font-semibold gold-text">Major:</span> ${data.major_name}</p>
+                <p><i class="fa-solid fa-house mr-3 gold-icon"></i>
+                    <span class="font-semibold gold-text">Dormitory:</span> ${data.dorm_name}</p>
+                <p><i class="fa-solid fa-door-closed mr-3 gold-icon"></i>
+                    <span class="font-semibold gold-text">Room Number:</span> ${data.room_number}</p>
+            `;
+                document.getElementById("profileInfo").innerHTML = profileHTML;
+            })
+            .catch(err => {
+                document.getElementById("profileInfo").innerHTML = `<p class="text-red-500">Error loading profile</p>`;
+            });
+    </script>
+</body>
+
+</html>

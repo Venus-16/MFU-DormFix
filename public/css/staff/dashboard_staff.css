@@ -1,0 +1,307 @@
+          body {
+              background-color: #f8f9fa;
+              font-family: 'Segoe UI', sans-serif;
+              padding-left: 150px;
+              padding-top: 80px;
+              /* ปรับตามความสูงจริงของ navbar */
+          }
+
+          .card {
+              border-radius: 20px;
+              box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+              background-color: #fff;
+          }
+
+          .status-completed {
+              background-color: #d4edda;
+              color: #155724;
+              border-radius: 20px;
+              padding: 4px 12px;
+              font-size: 0.9rem;
+          }
+
+          /* Chart sizing */
+          #barChart {
+              width: 100% !important;
+              height: 300px !important;
+              max-width: 900px;
+          }
+
+          .chart {
+              width: 600px;
+              height: 360px;
+          }
+
+          .chart-container {
+              width: 100%;
+              height: 300px;
+              max-width: 900px;
+              margin-top: 15px;
+              position: relative;
+          }
+
+          .chart-container canvas {
+              width: 100% !important;
+              height: 100% !important;
+          }
+
+          .table-wrapper {
+              overflow-x: auto;
+              -webkit-overflow-scrolling: touch;
+          }
+
+          select.form-select {
+              border-radius: 50px !important;
+              padding-right: 2.5rem !important;
+              color: white;
+              background-color: #2baf2b;
+              border: none;
+              -webkit-appearance: none;
+              -moz-appearance: none;
+              appearance: none;
+              cursor: pointer;
+              transition: background-color 0.3s, color 0.3s;
+          }
+
+          select.form-select option {
+              background-color: #fff;
+              color: #155724;
+          }
+
+          /* เมื่อพับ tabBar */
+          body.sidebar-collapsed {
+              padding-left: 50px;
+          }
+
+          .update {
+              color: grey;
+          }
+
+          /* แก้ไขใหม่สำหรับหน้าจอแท็บเล็ต (iPad) */
+          @media (max-width: 1024px) {
+              #loading-overlay {
+                  top: 48px;
+                  left: 50px !important;
+                  height: calc(100vh - 48px);
+              }
+
+              .chart {
+                  width: 100%;
+                  height: 300px;
+              }
+
+              .container-fluid {
+                  padding: 15px;
+              }
+
+              .card {
+                  padding: 15px;
+              }
+
+              .form-select {
+                  font-size: 0.9rem;
+              }
+
+              .update {
+                  font-size: 0.9rem;
+              }
+
+              #barChart {
+                  width: 100% !important;
+                  height: 275px !important;
+              }
+
+              .card h2 {
+                  font-size: 1.8rem;
+              }
+
+              /* ทำให้ card ในแถวเดียวกันเรียงเป็นแนวตั้ง */
+              .row.g-4>div {
+                  width: 100% !important;
+              }
+
+              .row.mt-4 {
+                  flex-direction: row !important;
+                  flex-wrap: wrap;
+                  gap: 20px;
+              }
+
+              .row.mt-4>.col-md-6,
+              .row.mt-4>.col-lg-4 {
+                  width: 100% !important;
+                  flex: 0 0 100%;
+              }
+
+              .card .chart-container {
+                  height: 260px;
+              }
+
+              .card[style*="width: 620px"] {
+                  width: 100% !important;
+                  height: auto !important;
+              }
+          }
+
+          @media (min-width: 900px) and (max-width: 1400px) and (orientation: landscape) {
+
+              /* สำหรับ iPad, Tablet ทุกขนาดแนวนอน */
+              #loading-overlay {
+                  top: 48px;
+                  left: 42px;
+                  height: calc(100vh - 48px);
+              }
+          }
+
+          /* แก้ไขใหม่สำหรับหน้าจอมือถือ */
+          @media (max-width: 768px) {
+              #loading-overlay {
+                  top: 48px;
+                  left: 37px !important;
+                  height: calc(100vh - 48px);
+              }
+
+              .chart {
+                  width: auto;
+                  height: 360px;
+              }
+
+              .container-fluid {
+                  padding: 10px;
+              }
+
+              .d-flex.justify-content-between {
+                  flex-direction: column;
+                  align-items: flex-start !important;
+                  gap: 10px;
+              }
+
+              .form-select {
+                  width: 100%;
+              }
+
+              .card {
+                  padding: 12px;
+                  width: 300px;
+              }
+
+              /* ทำให้ card ในแถวเดียวกันเรียงเป็นแนวตั้ง */
+              .row.g-4>div {
+                  width: 100% !important;
+              }
+
+              .row.mt-4>.col-md-6,
+              .row.mt-4>.col-lg-4 {
+                  width: 100% !important;
+                  max-width: 100%;
+                  flex: 0 0 100%;
+              }
+
+              .card h2 {
+                  font-size: 1.6rem;
+              }
+
+              .card h5,
+              .card h6 {
+                  font-size: 1rem;
+                  text-align: center;
+              }
+
+              .chart-container {
+                  height: 240px;
+                  overflow-x: auto;
+              }
+
+              .table thead {
+                  font-size: 0.8rem;
+              }
+
+              .table td {
+                  font-size: 0.85rem;
+                  white-space: nowrap;
+              }
+
+              .card[style*="width: 620px"] {
+                  width: 100% !important;
+                  height: auto !important;
+              }
+          }
+
+          @media (max-width: 900px) and (orientation: landscape) {
+
+              /* สำหรับ iPhone ทุกขนาดแนวนอน */
+              #loading-overlay {
+                  top: 48px;
+                  left: 15px !important;
+                  height: calc(100vh - 48px);
+              }
+          }
+
+          /* RepairType Select Styling */
+          .repairtype-select {
+              min-width: 170px;
+              max-width: 210px;
+              border-radius: 1.5rem;
+              font-size: 1rem;
+              border: 1.5px solid #d0cde1;
+              padding: 0.25rem 1.5rem 0.25rem 0.75rem;
+              background: #f8f9fa;
+              margin-left: 0.5rem;
+          }
+
+          /* Main Content Area */
+          #loading-overlay {
+              position: absolute;
+              /* Place overlay below the navbar/tabbar */
+              top: 0;
+              /* Change this value to match your navbar height */
+              left: 0;
+              width: 100%;
+              height: calc(100vh - 56px);
+              /* Overlay only the area below navbar/tabbar */
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              background: rgba(255, 255, 255, 0.85);
+              z-index: 9999;
+          }
+
+          /* Prevent loader overlay from inheriting global font styles */
+          #loading-overlay,
+          #loading-overlay * {
+              font-family: inherit !important;
+              font-weight: inherit !important;
+              color: inherit !important;
+          }
+
+          /* Loader content styles */
+          #loading-overlay .loader-content {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+          }
+
+          #loading-overlay .loader-content .loading-icon {
+              width: 64px;
+              height: 64px;
+              background: url("/public/img/loader-hourglass.svg") no-repeat center/contain;
+              margin-bottom: 16px;
+          }
+
+          #loading-overlay .loader-content .loading-text {
+              font-size: 1.3em;
+              color: #444;
+              letter-spacing: 2px;
+              font-family: 'Courier New', Courier, monospace;
+          }
+
+          #main-content-area {
+              position: relative;
+              min-height: 10vh;
+          }
+
+          body.loading-active {
+              overflow: hidden !important;
+              position: fixed;
+              width: 100%;
+          }

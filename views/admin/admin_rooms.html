@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Manage Rooms</title>
+  <link rel="shortcut icon" href="/public/img/MFU.png" type="image/x-icon">
+  <link rel="stylesheet" href="/public/css/staff/nav_bar_staff.css" />
+  <link rel="stylesheet" href="/public/css/admin/admin_dorm.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <style>
+    .loader-overlay {
+      position: fixed;
+      z-index: 9999;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: #fffbe9cc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .loader-overlay.hidden { display: none; }
+    .center-loader-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100vw;
+    }
+    .loader-visual {
+      --c1:#673b14;
+      --c2:#f8b13b;
+      width: 40px;
+      height: 80px;
+      border-top: 4px solid var(--c1);
+      border-bottom: 4px solid var(--c1);
+      background: linear-gradient(90deg, var(--c1) 2px, var(--c2) 0 5px,var(--c1) 0) 50%/7px 8px no-repeat;
+      display: grid;
+      overflow: hidden;
+      animation: l5-0 2s infinite linear;
+    }
+    .loader-visual::before,
+    .loader-visual::after {
+      content: "";
+      grid-area: 1/1;
+      width: 75%;
+      height: calc(50% - 4px);
+      margin: 0 auto;
+      border: 2px solid var(--c1);
+      border-top: 0;
+      box-sizing: content-box;
+      border-radius: 0 0 40% 40%;
+      -webkit-mask:
+        linear-gradient(#000 0 0) bottom/4px 2px no-repeat,
+        linear-gradient(#000 0 0);
+      -webkit-mask-composite: destination-out;
+              mask-composite: exclude;
+      background:
+        linear-gradient(var(--d,0deg),var(--c2) 50%,#0000 0) bottom /100% 205%,
+        linear-gradient(var(--c2) 0 0) center/0 100%;
+      background-repeat: no-repeat;
+      animation: inherit;
+      animation-name: l5-1;
+    }
+    .loader-visual::after {
+      transform-origin: 50% calc(100% + 2px);
+      transform: scaleY(-1);
+      --s:3px;
+      --d:180deg;
+    }
+    @keyframes l5-0 {
+      80%  {transform: rotate(0)}
+      100% {transform: rotate(0.5turn)}
+    }
+    @keyframes l5-1 {
+      10%,70%  {background-size:100% 205%,var(--s,0) 100%}
+      70%,100% {background-position: top,center}
+    }
+    .loader-text {
+      width: fit-content;
+      font-weight: bold;
+      font-family: monospace;
+      font-size: 30px;
+      clip-path: inset(0 3ch 0 0);
+      animation: l4 1s steps(4) infinite;
+      color: #673b14;
+      background: #fffbe9;
+      padding: 0.5em 1em;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px #f8b13b33;
+      margin-top: 32px;
+    }
+    .loader-text:before {
+      content: "Loading...";
+    }
+    @keyframes l4 {to{clip-path: inset(0 -1ch 0 0)}}
+
+    .btn-file { background: #307cf6; color: #fff; }
+    .btn-add { background: #3e8e41; color: #fff; }
+    .room-table th, .room-table td { vertical-align: middle; }
+    .room-table .btn { min-width: 70px; }
+    .dropdown-dorm { min-width: 200px; }
+    .input-group-search { max-width: 300px; }
+    .table thead { background: #f7f7f7; }
+    /* Notification Dropdown Style */
+        .dropdown-fb {
+            position: fixed;
+            top: 75px;
+            right: 40px;
+            width: 350px;
+            background: #ffffff;
+            border: 2px solid #f7d86e;
+            border-radius: 18px;
+            box-shadow: 0 6px 24px #0002;
+            z-index: 3000;
+            display: none;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            transition: box-shadow 0.2s;
+        }
+        .dropdown-fb.show {
+            display: block !important;
+        }
+        .dropdown-fb-header {
+            padding: 16px 20px 8px 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #fae3a1;
+        }
+        .dropdown-fb-header .btn-link {
+            background: none;
+            border: none;
+            color: #1976d2;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        .dropdown-fb-tabs {
+            display: flex;
+            padding: 8px 20px;
+            gap: 10px;
+            border-bottom: 1px solid #fae3a1;
+        }
+        .fb-tab {
+            padding: 7px 22px;
+            border-radius: 20px;
+            border: none;
+            background: #f7e7b9;
+            font-weight: 500;
+            color: #25408f;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.2s, color 0.2s;
+        }
+        .fb-tab.active {
+            background: #25408f;
+            color: #fff;
+            font-weight: bold;
+        }
+        .dropdown-fb-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            max-height: 340px;
+            overflow-y: auto;
+        }
+        .fb-noti-item {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            padding: 16px 22px 14px 22px;
+            border-bottom: 1px solid #f7e7b9;
+            background: #fffbe9;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .fb-noti-item.unread {
+            background: #fff9e1;
+        }
+        .fb-noti-item.read {
+            background: #f3f2f2;
+            color: #aaa;
+        }
+        .fb-noti-top {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .fb-noti-icon {
+            font-size: 1.6rem;
+            margin-right: 2px;
+        }
+        .fb-noti-title {
+            font-weight: bold;
+            font-size: 1.08rem;
+            flex: 1;
+        }
+        .fb-noti-dot {
+            width: 11px;
+            height: 11px;
+            background: #1976d2;
+            border-radius: 50%;
+            margin-left: 7px;
+            margin-right: 2px;
+            display: inline-block;
+        }
+        .fb-noti-date {
+            font-size: 0.96rem;
+            color: #888;
+            margin-bottom: 2px;
+        }
+        .fb-noti-msg {
+            font-size: 0.97rem;
+            color: #444;
+            margin-bottom: 1px;
+        }
+        .dropdown-fb-footer {
+            padding: 12px 0;
+            text-align: center;
+            border-top: 1px solid #fae3a1;
+            background: #fffbe9;
+        }
+        .fb-seeall {
+            background: none;
+            border: none;
+            color: #1976d2;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        #notificationBtn .badge {
+            font-size: 1rem;
+            top: 2px;
+            left: 22px;
+            padding: 0 6px;
+        }
+  </style>
+</head>
+<body>
+  <!-- Loader Overlay -->
+  <div id="loaderOverlay" class="loader-overlay hidden">
+    <div class="center-loader-container">
+      <div class="loader-visual"></div>
+      <div class="loader-text"></div>
+    </div>
+  </div>
+  <div id="navbar"></div>
+  <div class="d-flex" style="flex:1;">
+    <div id="sidebar"></div>
+    <div class="main-content">
+      <div class="container py-2 mt-2">
+        <h2>Manage Rooms</h2>
+        <div class="d-flex align-items-center gap-3 mt-3 flex-wrap">
+          <div>
+            <select class="form-select form-select-sm dropdown-dorm" id="dormSelect"></select>
+          </div>
+          <div class="flex-grow-1">
+            <div class="input-group input-group-sm shadow-sm rounded input-group-search" style="background: #F5F5F5;">
+              <input type="search" class="form-control border-0" id="searchRoom" placeholder="Search for room or resident..." />
+              <span class="input-group-text bg-transparent border-0">
+                <i class="fa-solid fa-magnifying-glass"></i>
+              </span>
+            </div>
+          </div>
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addRoomModal"><i class="fa-solid fa-plus me-1"></i> Add</button>
+            <button class="btn btn-danger" id="deleteSelectedBtn"><i class="fa-solid fa-trash me-1"></i> Delete Selected</button>
+        </div>
+        <div class="table-responsive mt-4">
+          <table class="table table-bordered room-table">
+            <thead>
+              <tr>
+                <th>Room</th>
+                <th>Capacity (person)</th>
+                <th>Resident name</th>
+                <th style="width: 165px;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="roomsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Room Modal -->
+  <div class="modal fade" id="addRoomModal" tabindex="-1" aria-labelledby="addRoomModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addRoomModalLabel">Add Room</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="addRoomForm">
+            <div class="mb-3">
+              <label class="form-label">Add Type :</label>
+              <div>
+                <input type="radio" name="addType" id="addTypeSingle" value="single" checked />
+                <label for="addTypeSingle" style="margin-right: 2em;">Single Room</label>
+                <input type="radio" name="addType" id="addTypeRange" value="range" />
+                <label for="addTypeRange">Multiple Rooms (Range)</label>
+              </div>
+            </div>
+            <div id="singleRoomFields">
+              <div class="mb-3">
+                <label for="addRoomNumber" class="form-label">Room Number :</label>
+                <input type="text" id="addRoomNumber" class="form-control" />
+              </div>
+            </div>
+            <div id="rangeRoomFields" style="display: none;">
+              <div class="mb-3">
+                <label class="form-label">Room Number Range :</label>
+                <div class="d-flex gap-2">
+                  <input type="text" id="addRoomFrom" class="form-control" placeholder="From (e.g. 1101)" />
+                  <span class="px-2 pt-2">to</span>
+                  <input type="text" id="addRoomTo" class="form-control" placeholder="To (e.g. 1120)" />
+                </div>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="addRoomCapacity" class="form-label">Capacity (person) :</label>
+              <input type="number" id="addRoomCapacity" class="form-control" required min="1" />
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" id="confirmAddRoom" class="btn btn-success">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Room Modal -->
+  <div class="modal fade" id="editRoomModal" tabindex="-1" aria-labelledby="editRoomModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editRoomModalLabel">Edit Room</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editRoomForm">
+            <div class="mb-3">
+              <label for="editRoomNumber" class="form-label">Room Number :</label>
+              <input type="text" id="editRoomNumber" class="form-control" required />
+            </div>
+            <div class="mb-3">
+              <label for="editRoomCapacity" class="form-label">Capacity (person) :</label>
+              <input type="number" id="editRoomCapacity" class="form-control" required min="1" />
+            </div>
+            <div class="mb-2" id="editRoomError" style="color: red;"></div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" id="saveEditRoom" class="btn btn-warning">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Room Modal -->
+  <div class="modal fade" id="deleteRoomModal" tabindex="-1" aria-labelledby="deleteRoomModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteRoomModalLabel">Confirm Delete</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="deleteRoomModalBody"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" id="confirmDeleteRoomBtn" class="btn btn-danger">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Selected Rooms Modal -->
+  <div class="modal fade" id="deleteSelectedModal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold">Delete Rooms</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-2">
+            <input type="search" class="form-control form-control-sm" id="deleteSearch" placeholder="Search for room or resident...">
+          </div>
+          <table class="table table-bordered table-sm" id="deleteRoomsTable">
+            <thead>
+              <tr>
+                <th><input type="checkbox" id="deleteModalSelectAll"></th>
+                <th>Room</th>
+                <th>Capacity (person)</th>
+                <th>Resident name</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="modal-footer">
+          <span id="deleteCountInfo" class="me-auto text-muted small"></span>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" id="confirmDeleteSelectedBtn" disabled>Delete Selected</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Unable to delete room (when has residents) -->
+  <div class="modal fade" id="unableDeleteRoomModal" tabindex="-1" aria-labelledby="unableDeleteRoomLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="unableDeleteRoomLabel">Unable to Delete Room</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Unable to delete room because there are already users.
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
+    <div id="mainToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body" id="mainToastBody"></div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+      </div>
+    </div>
+  </div>
+
+<script>
+let dormsList = [];
+let roomsData = [];
+let studentsData = [];
+let currentDormId = null;
+let editRoomId = null;
+let deleteRoomId = null;
+let deleteSelectedChecked = new Set();
+let deleteRoomQueue = [];
+
+// ==== Loader ====
+function showLoader() {
+  document.getElementById('loaderOverlay').classList.remove('hidden');
+}
+function hideLoader() {
+  document.getElementById('loaderOverlay').classList.add('hidden');
+}
+// ==== Toast Notification function ====
+function showToast(message, isSuccess = true) {
+  const toastDiv = document.getElementById('mainToast');
+  const toastBody = document.getElementById('mainToastBody');
+  toastBody.textContent = message;
+  toastDiv.classList.remove('bg-success', 'bg-danger');
+  toastDiv.classList.add(isSuccess ? 'bg-success' : 'bg-danger');
+  const toast = new bootstrap.Toast(toastDiv);
+  toast.show();
+}
+
+// ==== Notification ====
+function setupNotification() {
+    setTimeout(() => {
+        let allNotifications = [];
+        let filterType = "all";
+        const notificationBtn = document.getElementById("notificationBtn");
+        const notificationDropdown = document.getElementById("notificationDropdown");
+        const notificationCount = document.getElementById("notificationCount");
+        const notificationList = document.getElementById("notificationList");
+        const markAllAsReadBtn = document.getElementById("markAllAsReadBtn");
+        const allNotiBtn = document.getElementById("allNotiBtn");
+        const unreadNotiBtn = document.getElementById("unreadNotiBtn");
+
+        if (!notificationBtn || !notificationDropdown) return;
+
+        // Toggle dropdown
+        notificationBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            notificationDropdown.classList.toggle("show");
+            renderNotifications();
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener("click", (e) => {
+            if (!notificationDropdown.contains(e.target) && !notificationBtn.contains(e.target)) {
+                notificationDropdown.classList.remove("show");
+            }
+        });
+
+        function formatDateDMYHM(dateStr) {
+            const d = new Date(dateStr);
+            const day = String(d.getDate()).padStart(2, '0');
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const year = d.getFullYear();
+            let hour = d.getHours();
+            let min = String(d.getMinutes()).padStart(2, '0');
+            let ampm = "AM";
+            if (hour >= 12) {
+                ampm = "PM";
+                if (hour > 12) hour -= 12;
+            }
+            if (hour === 0) hour = 12;
+            return `${day}/${month}/${year} ${hour}:${min} ${ampm}`;
+        }
+
+        function renderNotifications() {
+            notificationList.innerHTML = "";
+            let filtered = [];
+            if (filterType === "unread") {
+                filtered = allNotifications.filter(n => n.is_read === 0);
+            } else {
+                filtered = allNotifications;
+            }
+
+            if (filtered.length === 0) {
+                notificationList.innerHTML = `<li class="px-3 py-2 text-muted small">No notifications</li>`;
+                return;
+            }
+
+            filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+            filtered.forEach(noti => {
+                const li = document.createElement("li");
+                li.className =
+                    "px-3 py-2 small border-bottom cursor-pointer " +
+                    (noti.is_read === 0
+                        ? "bg-warning-subtle text-dark"
+                        : "bg-white text-muted");
+
+                li.innerHTML = `
+                    <div class="fw-bold">${noti.title || ""}</div>
+                    <div class="fw-normal">${noti.message || ""}</div>
+                    <div class="small text-secondary">${formatDateDMYHM(noti.created_at)}</div>
+                `;
+
+                li.addEventListener("click", async () => {
+                    if (noti.link) window.location.href = noti.link;
+                    await fetch("/admin/notifications/read", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ notification_id: noti.notification_id })
+                    });
+                    noti.is_read = 1;
+                    renderNotifications();
+                    updateNotificationCount();
+                });
+
+                notificationList.appendChild(li);
+            });
+        }
+
+        async function fetchNotifications() {
+            try {
+                const res = await fetch("/admin/notifications");
+                if (!res.ok) throw new Error("Failed to fetch");
+                const data = await res.json();
+                allNotifications = data;
+                renderNotifications();
+                updateNotificationCount();
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function updateNotificationCount() {
+            const unread = allNotifications.filter(n => n.is_read === 0).length;
+            if (unread > 0) {
+                notificationCount.textContent = unread;
+                notificationCount.classList.remove("d-none");
+            } else {
+                notificationCount.classList.add("d-none");
+            }
+        }
+
+        markAllAsReadBtn.addEventListener("click", async function () {
+            try {
+                await fetch('/admin/notifications/read-all', {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                await fetchNotifications();
+            } catch (e) {
+                console.error(e);
+            }
+        });
+
+        allNotiBtn.addEventListener("click", function () {
+            filterType = "all";
+            allNotiBtn.classList.add("active");
+            unreadNotiBtn.classList.remove("active");
+            renderNotifications();
+        });
+
+        unreadNotiBtn.addEventListener("click", function () {
+            filterType = "unread";
+            allNotiBtn.classList.remove("active");
+            unreadNotiBtn.classList.add("active");
+            renderNotifications();
+        });
+
+        fetchNotifications();
+        setInterval(fetchNotifications, 30000);
+    }, 300);
+}
+
+
+// Load sidebar/navbar and dorms
+window.addEventListener("DOMContentLoaded", () => {
+    showLoader();
+    fetch('/admin/sidebar')
+        .then(res => res.text())
+        .then(data => {
+            const temp = document.createElement('div');
+            temp.innerHTML = data;
+
+            const navbar = temp.querySelector('.navbar');
+            const tabs = temp.querySelector('.tabs');
+            const logoutModal = temp.querySelector('#logoutModal');
+const notificationDropdown = temp.querySelector('#notificationDropdown');
+
+            if (navbar) document.getElementById('navbar').appendChild(navbar);
+            if (tabs) document.getElementById('sidebar').appendChild(tabs);
+            if (logoutModal) document.body.appendChild(logoutModal);
+            if (notificationDropdown) document.body.appendChild(notificationDropdown);
+
+
+            // Sidebar functions
+            window.toggleSidebar = function () {
+                const sidebar = document.querySelector(".tabs");
+                const body = document.body;
+                sidebar.classList.toggle("collapsed");
+                body.classList.toggle("sidebar-collapsed");
+            };
+            window.showLogoutModal = function () {
+                const modal = new bootstrap.Modal(document.getElementById('logoutModal'));
+                modal.show();
+            };
+            window.handleLogout = function () {
+                window.location.href = "/login";
+            };
+            // Highlight tab
+            const currentPath = window.location.pathname.replace(/^\/|\/$/g, '');
+            const tabItems = document.querySelectorAll('.tab-item');
+            tabItems.forEach(item => {
+                const itemHref = item.getAttribute('href');
+                if (itemHref) {
+                    const normalizedItemHref = itemHref.replace(/^\/|\/$/g, '');
+                    if (
+                        normalizedItemHref === currentPath ||
+                        (normalizedItemHref === 'admin/dormitory' && currentPath === 'admin/rooms')
+                    ) {
+                        item.classList.add('active');
+                    }
+                }
+            });
+            // Setup notification after navbar loaded
+            setupNotification();
+            loadDormsList();
+        })
+        .finally(hideLoader);
+});
+
+async function loadDormsList() {
+    showLoader();
+    dormsList = await fetch('/api/dormitory').then(res => res.json());
+    const dormSelect = document.getElementById('dormSelect');
+    dormSelect.innerHTML = '';
+    dormsList.forEach(dorm => {
+        dormSelect.innerHTML += `<option value="${dorm.dorm_id}">${dorm.dorm_name}</option>`;
+    });
+
+    const urlParams = new URLSearchParams(window.location.search);
+    currentDormId = urlParams.get('dormId') || dormsList[0]?.dorm_id;
+    dormSelect.value = currentDormId;
+
+    dormSelect.addEventListener('change', function() {
+        currentDormId = this.value;
+        loadRoomsAndStudents();
+    });
+    await loadRoomsAndStudents();
+    hideLoader();
+}
+
+async function loadRoomsAndStudents() {
+    showLoader();
+    if (!currentDormId) return;
+    roomsData = await fetch(`/api/rooms?dorm_id=${currentDormId}`).then(res => res.json());
+    studentsData = await fetch('/api/students').then(res => res.json());
+    renderRoomsTable(roomsData);
+    hideLoader();
+}
+
+function renderRoomsTable(rooms) {
+    const tbody = document.getElementById('roomsTableBody');
+    tbody.innerHTML = '';
+    for (const room of rooms) {
+        // filter เฉพาะ status = 1
+        const residents = studentsData.filter(
+            s => s.room_id == room.room_id && s.dorm_id == currentDormId && (s.status === 1 || s.status === "1")
+        );
+        const residentNames = residents.map(r => r.name).join('<br>');
+        const capacityText = `${residents.length}/${room.room_capacity}`;
+        tbody.innerHTML += `
+            <tr>
+                <td>${room.room_number}</td>
+                <td>${capacityText}</td>
+                <td>${residentNames || '-'}</td>
+                <td>
+                    <button class="btn btn-warning btn-sm text-white mb-1" onclick="openEditRoomModal('${room.room_id}', '${room.room_number}', ${room.room_capacity})">Edit</button>
+                    <button class="btn btn-danger btn-sm mb-1" onclick="openDeleteRoomModal('${room.room_id}')">Delete</button>
+                </td>
+            </tr>
+        `;
+    }
+}
+
+document.getElementById('searchRoom').addEventListener('input', function() {
+    const keyword = this.value.trim().toLowerCase();
+    if (!keyword) {
+        renderRoomsTable(roomsData);
+        return;
+    }
+    const filtered = roomsData.filter(room => {
+        const roomNumMatch = room.room_number.toLowerCase().includes(keyword);
+        const residents = studentsData.filter(
+            s => s.room_id == room.room_id && s.dorm_id == currentDormId && (s.status === 1 || s.status === "1")
+        );
+        const residentMatch = residents.some(r => r.name.toLowerCase().includes(keyword));
+        return roomNumMatch || residentMatch;
+    });
+    renderRoomsTable(filtered);
+});
+
+document.getElementById('addTypeSingle').addEventListener('change', function() {
+  document.getElementById('singleRoomFields').style.display = 'block';
+  document.getElementById('rangeRoomFields').style.display = 'none';
+});
+document.getElementById('addTypeRange').addEventListener('change', function() {
+  document.getElementById('singleRoomFields').style.display = 'none';
+  document.getElementById('rangeRoomFields').style.display = 'block';
+});
+
+document.getElementById("confirmAddRoom").addEventListener("click", async () => {
+  showLoader();
+  const addType = document.querySelector('input[name="addType"]:checked').value;
+  const capacity = parseInt(document.getElementById("addRoomCapacity").value);
+  let roomNumbers = [];
+
+  if (addType === "single") {
+    const room_number = document.getElementById("addRoomNumber").value.trim();
+    if (!room_number || !capacity) {
+      showToast("Please fill all fields.", false);
+      hideLoader();
+      return;
+    }
+    roomNumbers.push(room_number);
+  } else {
+    const fromVal = document.getElementById("addRoomFrom").value.trim();
+    const toVal = document.getElementById("addRoomTo").value.trim();
+    if (!fromVal || !toVal || !capacity) {
+      showToast("Please fill all fields.", false);
+      hideLoader();
+      return;
+    }
+    if (/^\d+$/.test(fromVal) && /^\d+$/.test(toVal)) {
+      const fromNum = parseInt(fromVal);
+      const toNum = parseInt(toVal);
+      if (fromNum > toNum) {
+        showToast("Invalid range: From must be less than To", false);
+        hideLoader();
+        return;
+      }
+      for (let n = fromNum; n <= toNum; n++) {
+        roomNumbers.push(n.toString());
+      }
+    } else {
+      if (fromVal.length !== toVal.length) {
+        showToast("Room number format mismatch.", false);
+        hideLoader();
+        return;
+      }
+      let prefix = '';
+      let startNum = '', endNum = '';
+      for (let i = 0; i < fromVal.length; i++) {
+        if (fromVal[i] === toVal[i] && isNaN(parseInt(fromVal[i]))) {
+          prefix += fromVal[i];
+        } else {
+          startNum = fromVal.slice(i);
+          endNum = toVal.slice(i);
+          break;
+        }
+      }
+      if (!/^\d+$/.test(startNum) || !/^\d+$/.test(endNum)) {
+        showToast("Cannot parse room numbers.", false);
+        hideLoader();
+        return;
+      }
+      const sNum = parseInt(startNum);
+      const eNum = parseInt(endNum);
+      if (sNum > eNum) {
+        showToast("Invalid range: From must be less than To", false);
+        hideLoader();
+        return;
+      }
+      for (let n = sNum; n <= eNum; n++) {
+        roomNumbers.push(prefix + n.toString().padStart(startNum.length, '0'));
+      }
+    }
+  }
+
+
+  let successCount = 0, failCount = 0;
+  let errorMessages = [];
+  for (const room_number of roomNumbers) {
+    const res = await fetch("/api/rooms/add", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ room_number, room_capacity: capacity, dorm_id: currentDormId })
+    }).then(res => res.json());
+
+    if (res.success) {
+      successCount++;
+    } else {
+      failCount++;
+      if (res.message) errorMessages.push(res.message);
+    }
+  }
+
+  // รวมข้อความ error ไม่ให้ซ้ำ
+  const uniqueErrors = [...new Set(errorMessages)];
+
+  // --- ส่วนนี้ให้ใช้เฉพาะ uniqueErrors เท่านั้น ---
+  if (successCount && failCount === 0) {
+    showToast(`Added ${successCount} room(s) successfully!`);
+  } else if (successCount && failCount > 0) {
+    showToast(`Added ${successCount} room(s) successfully, but ${failCount} failed. : ${uniqueErrors.join(" / ")}`, false);
+  } else if (failCount > 0) {
+    showToast(uniqueErrors.join(" / ") || 'Failed to add rooms.', false);
+  }
+
+  document.getElementById('addRoomForm').reset();
+  bootstrap.Modal.getOrCreateInstance(document.getElementById('addRoomModal')).hide();
+  await loadRoomsAndStudents();
+  hideLoader();
+});
+
+// Edit
+window.openEditRoomModal = function(room_id, room_number, room_capacity) {
+    editRoomId = room_id;
+    document.getElementById('editRoomNumber').value = room_number;
+    document.getElementById('editRoomCapacity').value = room_capacity;
+    document.getElementById('editRoomError').innerText = ""; // ล้าง error ทุกครั้งที่เปิด
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('editRoomModal')).show();
+};
+
+document.getElementById('saveEditRoom').addEventListener('click', async function() {
+    showLoader();
+    // clear error msg
+    document.getElementById('editRoomError').innerText = "";
+    const room_number = document.getElementById('editRoomNumber').value.trim();
+    const room_capacity = parseInt(document.getElementById('editRoomCapacity').value);
+    if (!room_number || !room_capacity) {
+        document.getElementById('editRoomError').innerText = 'Please fill all fields';
+        hideLoader();
+        return;
+    }
+    const res = await fetch(`/api/rooms/${editRoomId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ room_number, room_capacity })
+    });
+    const data = await res.json();
+    if (data.success) {
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('editRoomModal')).hide();
+        await loadRoomsAndStudents();
+        showToast("Room updated successfully!");
+    } else {
+        // แสดง error จาก backend
+        document.getElementById('editRoomError').innerText = data.message || 'Edit failed';
+        showToast(data.message || 'Edit failed', false);
+    }
+    hideLoader();
+});
+
+// --- DELETE ROOM (Single) ---
+window.openDeleteRoomModal = function(room_id) {
+    const residents = studentsData.filter(
+        s => s.room_id == room_id && s.dorm_id == currentDormId && (s.status === 1 || s.status === "1")
+    );
+    if (residents.length > 0) {
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('unableDeleteRoomModal')).show();
+        return;
+    }
+    document.getElementById('deleteRoomModalBody').innerHTML = "Are you sure you want to delete this room?";
+    deleteRoomQueue = [room_id];
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('deleteRoomModal')).show();
+};
+document.getElementById('confirmDeleteRoomBtn').addEventListener('click', async function() {
+    showLoader();
+    let failed = 0;
+    for (const room_id of deleteRoomQueue) {
+        const res = await fetch(`/api/rooms/${room_id}`, { method: 'DELETE' });
+        const result = await res.json();
+        if (!result.success) failed++;
+    }
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('deleteRoomModal')).hide();
+    await loadRoomsAndStudents();
+    if (deleteRoomQueue.length > 1) {
+        if (failed === 0) showToast("Deleted selected rooms!");
+        else showToast("Some rooms could not be deleted.", false);
+    } else {
+        if (failed === 0) showToast("Room deleted!");
+        else showToast("Delete failed!", false);
+    }
+    deleteRoomQueue = [];
+    hideLoader();
+});
+
+// --- DELETE SELECTED ROOMS (Modal) ---
+function renderDeleteRoomsTable() {
+    const tbody = document.querySelector("#deleteRoomsTable tbody");
+    const search = document.getElementById("deleteSearch").value.trim().toLowerCase();
+    let filtered = roomsData;
+    if (search) {
+        filtered = roomsData.filter(room => {
+            const roomNumMatch = room.room_number.toLowerCase().includes(search);
+            const residents = studentsData.filter(
+                s => s.room_id == room.room_id && s.dorm_id == currentDormId && (s.status === 1 || s.status === "1")
+            );
+            const residentMatch = residents.some(r => r.name.toLowerCase().includes(search));
+            return roomNumMatch || residentMatch;
+        });
+    }
+    tbody.innerHTML = "";
+    filtered.forEach(room => {
+        const residents = studentsData.filter(
+            s => s.room_id == room.room_id && s.dorm_id == currentDormId && (s.status === 1 || s.status === "1")
+        );
+        const residentNames = residents.map(r => r.name).join('<br>');
+        const checked = deleteSelectedChecked.has(room.room_id) ? "checked" : "";
+        tbody.innerHTML += `
+            <tr>
+                <td><input type="checkbox" class="modal-delete-checkbox" value="${room.room_id}" ${checked}></td>
+                <td>${room.room_number}</td>
+                <td>${room.room_capacity}</td>
+                <td>${residentNames || '-'}</td>
+            </tr>`;
+    });
+    updateDeleteCountInfo();
+}
+function updateDeleteCountInfo() {
+    document.getElementById("deleteCountInfo").textContent =
+        `${deleteSelectedChecked.size} room(s) selected`;
+    document.getElementById("confirmDeleteSelectedBtn").disabled = deleteSelectedChecked.size === 0;
+}
+document.getElementById('deleteSelectedBtn').addEventListener('click', function () {
+    deleteSelectedChecked.clear();
+    document.getElementById("deleteSearch").value = "";
+    renderDeleteRoomsTable();
+    bootstrap.Modal.getOrCreateInstance(document.getElementById("deleteSelectedModal")).show();
+});
+document.getElementById("deleteSearch").addEventListener("input", renderDeleteRoomsTable);
+document.getElementById("deleteRoomsTable").addEventListener("change", function (e) {
+    if (e.target.classList.contains("modal-delete-checkbox")) {
+        const room_id = e.target.value;
+        if (e.target.checked) deleteSelectedChecked.add(room_id);
+        else deleteSelectedChecked.delete(room_id);
+        updateDeleteCountInfo();
+    }
+});
+document.getElementById("deleteModalSelectAll").addEventListener("change", function (e) {
+    const checkboxes = document.querySelectorAll(".modal-delete-checkbox");
+    if (e.target.checked) {
+        checkboxes.forEach(cb => { cb.checked = true; deleteSelectedChecked.add(cb.value); });
+    } else {
+        checkboxes.forEach(cb => { cb.checked = false; deleteSelectedChecked.delete(cb.value); });
+    }
+    updateDeleteCountInfo();
+});
+document.getElementById("confirmDeleteSelectedBtn").addEventListener("click", async function () {
+    showLoader();
+    if (deleteSelectedChecked.size === 0) {
+        hideLoader();
+        return;
+    }
+    let roomsWithResidents = [];
+    let roomsWithoutResidents = [];
+    for (const room_id of deleteSelectedChecked) {
+        const residents = studentsData.filter(
+            s => s.room_id == room_id && s.dorm_id == currentDormId && (s.status === 1 || s.status === "1")
+        );
+        if (residents.length > 0) roomsWithResidents.push(room_id);
+        else roomsWithoutResidents.push(room_id);
+    }
+    if (roomsWithResidents.length > 0) {
+        bootstrap.Modal.getOrCreateInstance(document.getElementById("deleteSelectedModal")).hide();
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('unableDeleteRoomModal')).show();
+        hideLoader();
+        return;
+    }
+    bootstrap.Modal.getOrCreateInstance(document.getElementById("deleteSelectedModal")).hide();
+    document.getElementById('deleteRoomModalBody').innerHTML = `Are you sure you want to delete <b>${roomsWithoutResidents.length}</b> selected room(s)?`;
+    deleteRoomQueue = [...roomsWithoutResidents];
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('deleteRoomModal')).show();
+    hideLoader();
+});
+</script>
+</body>
+</html>

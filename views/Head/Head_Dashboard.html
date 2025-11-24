@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/public/css/Head/Dashboard.css">
+    <link rel="shortcut icon" href="/public/img/MFU.png" type="image/x-icon">
+
+    <title>Dashboard</title>
+    <style>
+        .sidebar .menu>li>a#dashboardMenu,
+        .sidebar .menu>li>a#dashboardMenu i,
+        .sidebar .menu>li>a#dashboardMenu span {
+            color: #222 !important;
+        }
+
+        .sidebar .menu>li.active>a#dashboardMenu,
+        .sidebar .menu>li.active>a#dashboardMenu i,
+        .sidebar .menu>li.active>a#dashboardMenu span {
+            color: #222 !important;
+        }
+
+        .content-wrapper {
+            position: relative;
+        }
+
+        #loading-overlay {
+            /* Change position to absolute to be contained by .content-wrapper */
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #fffbe9;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            /* z-index to ensure it's on top of the wrapper's content */
+            z-index: 1040;
+            transition: opacity 0.5s ease;
+            opacity: 1;
+        }
+
+        .hidden {
+            display: none !important;
+            opacity: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="navbar-placeholder"></div>
+    <div class="content-wrapper">
+        <div id="loading-overlay"></div>
+
+        <div class="container-fluid ">
+            <div class="last-update" id="lastUpdate" style="font-size: 25px;">Loading...</div>
+            <div class="row mb-3">
+                <div class="col-md-3 col-sm-6 mt-3">
+                    <label for="dormitory" class="form-label">Dormitory</label>
+                    <select class="form-select" id="dormitory"></select>
+                </div>
+            </div>
+
+            <div class="row text-center mb-4">
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                            <div class="d-flex align-items-center justify-content-center mb-2">
+                                <i class="fa-solid fa-square-poll-horizontal fs-4 text-primary me-2"></i>
+                                <h5 class="mb-0">Total Repair Requests</h5>
+                            </div>
+                            <h2 id="totalRequests">0</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                            <div class="d-flex align-items-center justify-content-center mb-2">
+                                <i class="bi bi-hourglass-split  fs-4 text-warning me-2"></i>
+                                <h5 class="mb-0 me-2">Pending Repair Requests</h5>
+                            </div>
+                            <h2 id="pendingRequests">0</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                            <div class="d-flex align-items-center justify-content-center mb-2">
+                                <i class="fa-solid fa-spinner fs-4 text-info me-2"></i>
+                                <h5 class="mb-0 ">Confirmed Repair Requests</h5>
+                            </div>
+                            <h2 id="confirmedRequests">0</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                            <div class="d-flex align-items-center justify-content-center mb-2">
+                                <i class="bi  bi-clipboard-check fs-4 text-success me-2"></i>
+                                <h5 class="mb-0">Completed Repair Requests</h5>
+                            </div>
+                            <h2 id="completedRequests">0</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                            <div class="d-flex align-items-center justify-content-center mb-2">
+                                <i class="bi bi-x-circle fs-4 text-danger me-2"></i>
+                                <h5 class="mb-0">Cancel Repair Requests</h5>
+                            </div>
+                            <h2 id="cancelRequests">0</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-12 col-lg-4 mb-4">
+                    <h5>Top Repair Request Type</h5>
+                    <div class="chart-container">
+                        <canvas id="repairTypeChart"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-12 col-lg-4 mb-4">
+                    <h5>Top 5 Rooms with Most Repairs</h5>
+                    <div class="chart-container">
+                        <canvas id="roomRepairChart"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-12 col-lg-4">
+                    <h5>Technician Rating</h5>
+                    <select class="form-select mb-2" id="technicianTypeFilter">
+                        <option value="all" selected>All Technician Type</option>
+                    </select>
+                    <ul class="list-group" id="technicianRatingList">
+                        <li class="list-group-item text-muted">Loading...</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="recent-requests-section ">
+                <div class="row mt-2 ">
+                    <h5>Recent Repair Completed</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Request Date</th>
+                                    <th>Reporter's Name</th>
+                                    <th>Item</th>
+                                    <th>Damage Description</th>
+                                    <th>Room</th>
+                                    <th>Technician</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentRequestsTableBody">
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/public/js/Head/Head_Dashboard.js" defer></script>
+    <script src="/public/js/Head/navbar-notification.js"></script>
+    <script>
+        // ฟังก์ชั่นสำหรับเปิด/ปิด loading overlay
+        function showLoading() {
+            const overlay = document.getElementById('loading-overlay');
+            overlay.style.display = 'flex'; // Use flex to center the loader correctly.
+            fetch('/loading')
+                .then(res => res.text())
+                .then(html => {
+                    overlay.innerHTML = html;
+                });
+        }
+        function hideLoading() {
+            const overlay = document.getElementById('loading-overlay');
+            // Fade out first
+            overlay.style.opacity = '0';
+            // Then hide after the transition is complete
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                overlay.innerHTML = '';
+            }, 500); // Must match the CSS transition duration
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            showLoading();
+
+            fetch('/head/dashboard/data?dorm_id=6')
+                .then(res => res.json())
+                .then(data => {
+                    // ... render dashboard ตามปกติ
+                })
+                .finally(() => {
+                    // ดีเลย์ 1.5 วินาที เพื่อให้เห็น loading
+                    setTimeout(hideLoading, 1500);
+                });
+        });
+
+    </script>
+</body>
+
+</html>

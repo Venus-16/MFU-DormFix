@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MFU DormFix Dashboard</title>
+    <link rel="shortcut icon" href="/public/img/MFU.png" type="image/x-icon">
+    <link rel="stylesheet" href="/public/css/staff/dashboard_staff.css">
+    <link rel="stylesheet" href="/public/css/staff/nav_bar_staff.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<body>
+    <!-- Navbar loaded via AJAX and contains notification bell and dropdown -->
+    <div id="navbar"></div>
+    <div class="d-flex" style="flex: 1;">
+        <div id="sidebar"></div>
+        <div class="main-content">
+            <div class="container" id="main-content-area">
+                <div id="loading-overlay"></div>
+                <div class="container-fluid">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <select class="form-select rounded-pill px-4" id="dormSelect" style="width: 100%;">
+                            </select>
+                        </div>
+                        <div>
+                            <h2 class="update">Last Update : <span id="lastUpdate"></span></h2>
+                        </div>
+                    </div>
+                    <div class="container">
+                        <div class="row g-4 justify-content-center">
+                            <div class="col-6 col-md-auto col-lg">
+                                <div class="card text-center p-3 h-100">
+                                    <h5><i class="fa-solid fa-square-poll-horizontal fs-4 text-primary me-2"></i>Total
+                                        Repair Requests</h5>
+                                    <h2>0</h2>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-auto col-lg">
+                                <div class="card text-center p-3 h-100">
+                                    <h5><i class="bi bi-hourglass-split fs-4 text-warning me-2"></i>Repair Pending</h5>
+                                    <h2>0</h2>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-auto col-lg">
+                                <div class="card text-center p-3 h-100">
+                                    <h5><i class="fa-solid fa-spinner fs-4 text-info me-2"></i>Repair Confirmed</h5>
+                                    <h2>0</h2>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-auto col-lg">
+                                <div class="card text-center p-3 h-100">
+                                    <h5><i class="bi bi-clipboard-check fs-4 text-success me-2"></i>Repair Completed
+                                    </h5>
+                                    <h2>0</h2>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-auto col-lg">
+                                <div class="card text-center p-3 h-100">
+                                    <h5><i class="bi bi-x-circle fs-4 text-danger me-2"></i>Repair Cancel</h5>
+                                    <h2>0</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="card p-3">
+                            <h6 class="text-center">Top of Repair Requests</h6>
+                            <canvas id="barChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-lg-4 mb-4">
+                        <div class="card p-3 chart">
+                            <h6 class="text-center">Top 5 Rooms with Most Repairs</h6>
+                            <div class="chart-container">
+                                <canvas id="roomRepairChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card mt-4 p-3">
+                    <h6>Recent Repair Completed</h6>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Request Date</th>
+                                    <th>Reporter's Name</th>
+                                    <th>Item</th>
+                                    <th>Damage Description</th>
+                                    <th>Room</th>
+                                    <th>Technician</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        let barChartInstance = null;
+        let roomChartInstance = null;
+
+        function showLoaderContent() {
+            const overlay = document.getElementById('loading-overlay');
+            overlay.style.display = 'flex';
+            overlay.innerHTML = '';
+            document.body.classList.add('loading-active');
+            fetch('/loading')
+                .then(res => res.text())
+                .then(html => {
+                    overlay.innerHTML = `<div class="loader-content">${html}</div>`;
+                    overlay.style.background = '#fffbe9';
+                });
+        }
+
+        function hideLoaderContent() {
+            const overlay = document.getElementById('loading-overlay');
+            overlay.style.display = 'none';
+            overlay.innerHTML = '';
+            overlay.style.background = '';
+            document.body.classList.remove('loading-active');
+        }
+
+        const formatDate = (date) => {
+            const d = String(date.getDate()).padStart(2, '0');
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const y = date.getFullYear();
+            return `${d}/${m}/${y}`;
+        };
+
+        // ---- Notification Logic (เหมือนของ navbar) ----
+        let allNotifications = [];
+        let filterType = "all"; // "all" or "unread"
+
+        // Function to format date for notification
+        function formatDateDMYHM(dateStr) {
+            const d = new Date(dateStr);
+            const day = String(d.getDate()).padStart(2, '0');
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const year = d.getFullYear();
+            let hour = d.getHours();
+            let min = String(d.getMinutes()).padStart(2, '0');
+            let ampm = "AM";
+            if (hour >= 12) {
+                ampm = "PM";
+                if (hour > 12) hour -= 12;
+            }
+            if (hour === 0) hour = 12;
+            return `${day}/${month}/${year} ${hour}:${min} ${ampm}`;
+        }
+
+        // Render notifications
+        function renderNotifications() {
+            const notificationList = document.getElementById("notificationList");
+            const notificationCount = document.getElementById("notificationCount");
+            let filtered = [];
+            if (filterType === "unread") {
+                filtered = allNotifications.filter(n => n.is_read === 0);
+            } else {
+                filtered = allNotifications;
+            }
+
+            notificationList.innerHTML = "";
+            if (filtered.length === 0) {
+                notificationList.innerHTML = `<li class="px-3 py-2 text-muted small">No notifications</li>`;
+                return;
+            }
+
+            // Latest first
+            filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+            filtered.forEach(noti => {
+                const li = document.createElement("li");
+                li.className =
+                    "px-3 py-2 small border-bottom cursor-pointer " +
+                    (noti.is_read === 0
+                        ? "bg-warning-subtle text-dark"
+                        : "bg-white text-muted");
+
+                li.innerHTML = `
+                    <div class="fw-bold">${noti.title || ""}</div>
+                    <div class="fw-normal">${noti.message || ""}</div>
+                    <div class="small text-secondary">${formatDateDMYHM(noti.created_at)}</div>
+                `;
+
+                li.addEventListener("click", async () => {
+                    await fetch("/staff/notifications/read", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ notification_id: noti.notification_id })
+                    });
+                    noti.is_read = 1;
+                    renderNotifications();
+                    updateNotificationCount();
+                    if (noti.link) {
+                        window.location.href = noti.link;
+                    }
+                });
+
+                notificationList.appendChild(li);
+            });
+        }
+
+        // Fetch notifications
+        async function fetchNotifications() {
+            try {
+                const res = await fetch("/staff/notifications");
+                if (!res.ok) throw new Error("Failed to fetch");
+                const data = await res.json();
+                allNotifications = data;
+                renderNotifications();
+                updateNotificationCount();
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        // Update notification badge
+        function updateNotificationCount() {
+            const notificationCount = document.getElementById("notificationCount");
+            const unread = allNotifications.filter(n => n.is_read === 0).length;
+            if (unread > 0) {
+                notificationCount.textContent = unread;
+                notificationCount.classList.remove("d-none");
+            } else {
+                notificationCount.classList.add("d-none");
+            }
+        }
+
+        // Setup notification events
+        function setupNotificationEvents() {
+            const notificationBtn = document.getElementById("notificationBtn");
+            const notificationDropdown = document.getElementById("notificationDropdown");
+            const markAllAsReadBtn = document.getElementById("markAllAsReadBtn");
+            const allNotiBtn = document.getElementById("allNotiBtn");
+            const unreadNotiBtn = document.getElementById("unreadNotiBtn");
+
+            if (!notificationBtn || !notificationDropdown) return;
+            notificationBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                notificationDropdown.style.display =
+                    notificationDropdown.style.display === "block" ? "none" : "block";
+                renderNotifications();
+            });
+
+            document.addEventListener("click", (e) => {
+                if (!notificationDropdown.contains(e.target) && !notificationBtn.contains(e.target)) {
+                    notificationDropdown.style.display = "none";
+                }
+            });
+
+            if (markAllAsReadBtn) {
+                markAllAsReadBtn.addEventListener("click", async function () {
+                    try {
+                        await fetch('/staff/notifications/read-all', {
+                            method: 'POST',
+                            credentials: 'include'
+                        });
+                        await fetchNotifications();
+                    } catch (e) {
+                        console.error(e);
+                    }
+                });
+            }
+
+            if (allNotiBtn && unreadNotiBtn) {
+                allNotiBtn.addEventListener("click", function () {
+                    filterType = "all";
+                    allNotiBtn.classList.add("active");
+                    unreadNotiBtn.classList.remove("active");
+                    renderNotifications();
+                });
+
+                unreadNotiBtn.addEventListener("click", function () {
+                    filterType = "unread";
+                    allNotiBtn.classList.remove("active");
+                    unreadNotiBtn.classList.add("active");
+                    renderNotifications();
+                });
+            }
+        }
+
+        window.addEventListener("DOMContentLoaded", () => {
+            showLoaderContent();
+
+            // Load Navbar and Sidebar (Navbar includes notification bell & dropdown)
+            const navbarPromise = fetch('/staff/nevbar')
+                .then(res => res.text())
+                .then(data => {
+                    const temp = document.createElement('div');
+                    temp.innerHTML = data;
+
+                    const navbar = temp.querySelector('.navbar');
+                    const tabs = temp.querySelector('.tabs');
+                    const logoutModal = temp.querySelector('#logoutModal');
+
+                    if (navbar) document.getElementById('navbar').appendChild(navbar);
+                    if (tabs) document.getElementById('sidebar').appendChild(tabs);
+                    if (logoutModal) document.body.appendChild(logoutModal);
+
+                    fetch('/staff/nevbar_name')
+                        .then(res => res.json())
+                        .then(data => {
+                            const navName = document.getElementById('nav-name');
+                            if (navName) navName.textContent = data.name;
+                        })
+                        .catch(() => {
+                            const navName = document.getElementById('nav-name');
+                            if (navName) navName.textContent = "Staff";
+                        });
+
+                    window.toggleSidebar = function () {
+                        const sidebar = document.querySelector(".tabs");
+                        const body = document.body;
+                        sidebar.classList.toggle("collapsed");
+                        body.classList.toggle("sidebar-collapsed");
+                    };
+
+                    window.showLogoutModal = function () {
+                        const modal = new bootstrap.Modal(document.getElementById('logoutModal'));
+                        modal.show();
+                    };
+
+                    window.handleLogout = function () {
+                        fetch('/logout', { method: 'POST', credentials: 'include' })
+                            .then(() => window.location.href = "/logout");
+                    };
+
+                    const currentPath = window.location.pathname;
+                    document.querySelectorAll('.tab-item').forEach(item => {
+                        const href = item.getAttribute('href');
+                        if (href && currentPath.startsWith(href)) item.classList.add('active');
+                    });
+
+                    // ---- Notification bell logic (เหมือน navbar) ----
+                    setTimeout(() => {
+                        setupNotificationEvents();
+                        fetchNotifications();
+                        setInterval(fetchNotifications, 30000);
+                    }, 100);
+                });
+
+            // Load dormitories and select user's dorm automatically
+            const dormPromise = fetch('/dormitories')
+                .then(res => res.json())
+                .then(dormData => {
+                    const dormSelect = document.getElementById('dormSelect');
+                    dormSelect.innerHTML = '<option value="">All Dormitories</option>';
+                    dormData.forEach(d => {
+                        dormSelect.innerHTML += `<option value="${d.dorm_name}">${d.dorm_name}</option>`;
+                    });
+
+                    return fetch('/staff/profile_data')
+                        .then(res => res.json())
+                        .then(profile => {
+                            dormSelect.value = profile.dorm_name || '';
+                        })
+                        .catch(() => {
+                            dormSelect.value = '';
+                        });
+                });
+
+            Promise.all([navbarPromise, dormPromise]).then(() => {
+                setTimeout(() => {
+                    hideLoaderContent();
+                    const dormSelect = document.getElementById('dormSelect');
+                    reloadDashboardData(dormSelect.value);
+                }, 1000);
+            });
+
+            document.getElementById('dormSelect').addEventListener('change', function () {
+                reloadDashboardData(this.value);
+            });
+
+            async function reloadDashboardData(dorm) {
+                try {
+                    const [summaryData, categoryChartData, roomChartData, recentData] = await Promise.all([
+                        fetch('/staff/dashboard/summary' + (dorm ? '?dorm=' + encodeURIComponent(dorm) : '')).then(res => res.json()),
+                        fetch('/staff/dashboard/category-chart' + (dorm ? '?dorm=' + encodeURIComponent(dorm) : '')).then(res => res.json()),
+                        fetch('/staff/dashboard/room-chart' + (dorm ? '?dorm=' + encodeURIComponent(dorm) : '')).then(res => res.json()),
+                        fetch('/staff/dashboard/recent' + (dorm ? '?dorm=' + encodeURIComponent(dorm) : '')).then(res => res.json())
+                    ]);
+
+                    document.querySelectorAll('.card h2')[0].textContent = summaryData.total || 0;
+                    document.querySelectorAll('.card h2')[1].textContent = summaryData.pending || 0;
+                    document.querySelectorAll('.card h2')[2].textContent = summaryData.confirmed || 0;
+                    document.querySelectorAll('.card h2')[3].textContent = summaryData.completed || 0;
+                    document.querySelectorAll('.card h2')[4].textContent = summaryData.cancel || 0;
+
+                    const labels = categoryChartData.map(d => d.category_name);
+                    const values = categoryChartData.map(d => d.count);
+                    if (barChartInstance) barChartInstance.destroy();
+                    barChartInstance = new Chart(document.getElementById('barChart').getContext('2d'), {
+                        type: 'bar',
+                        data: {
+                            labels,
+                            datasets: [{
+                                label: 'Number of Requests',
+                                data: values,
+                                backgroundColor: ['#ff6384', '#36a2eb', '#ffcd56', '#4bc0c0', '#e57373', '#81c784'],
+                                borderRadius: 10
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: { y: { beginAtZero: true } }
+                        }
+                    });
+
+                    const roomLabels = roomChartData.map(d => d.room_number);
+                    const roomValues = roomChartData.map(d => d.count);
+                    if (roomChartInstance) roomChartInstance.destroy();
+                    roomChartInstance = new Chart(document.getElementById('roomRepairChart').getContext('2d'), {
+                        type: 'bar',
+                        data: {
+                            labels: roomLabels,
+                            datasets: [{
+                                label: 'Number of Repairs',
+                                data: roomValues,
+                                backgroundColor: '#9379C2',
+                                borderRadius: 10
+                            }]
+                        },
+                        options: {
+                            indexAxis: 'y',
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: { x: { beginAtZero: true } }
+                        }
+                    });
+
+                    const tbody = document.querySelector('table tbody');
+                    tbody.innerHTML = '';
+                    const sorted = recentData
+                        .filter(row => row.status === 'Completed')
+                        .sort((a, b) => new Date(b.request_date) - new Date(a.request_date))
+                        .slice(0, 10);
+                    sorted.forEach(row => {
+                        tbody.innerHTML += `
+                        <tr>
+                            <td>${formatDate(new Date(row.request_date))}</td>
+                            <td>${row.reporter}<br><small>${row.email}</small></td>
+                            <td>${row.article}</td>
+                            <td>${row.description}</td>
+                            <td>${row.room_number}</td>
+                            <td>${row.technician || '-'}</td>
+                            <td><span class="text-success">${row.status}</span></td>
+                        </tr>`;
+                    });
+
+                } catch (error) {
+                    console.error("Failed to load dashboard data:", error);
+                }
+            }
+
+            const lastUpdateElement = document.getElementById('lastUpdate');
+            const today = new Date();
+            lastUpdateElement.textContent = formatDate(today);
+        });
+    </script>
+</body>
+
+</html>

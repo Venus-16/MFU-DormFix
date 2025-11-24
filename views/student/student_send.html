@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="/public/img/MFU.png" type="image/x-icon">
+    <title>Submit Repair Request</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        html,
+        body {
+            overflow-x: hidden;
+            margin: 0;
+
+        }
+    </style>
+
+</head>
+
+<body>
+    <div id="navbar-container"></div>
+
+    <form id="repairForm" action="/student/submit-request" method="POST" enctype="multipart/form-data"
+        class="flex flex-col lg:flex-row min-h-screen">
+        <!-- Left side image -->
+        <div
+            class="w-full lg:w-1/2 bg-gradient-to-b from-[#FFF3C6] via-[#F7C85B] to-[#B3800C] flex items-center justify-center p-6">
+            <img src="/public/img/send.png" alt="Repair Illustration" class="w-50 h-50" />
+        </div>
+
+        <!-- Right side form -->
+        <div class="flex flex-col w-full lg:w-1/2 p-6 lg:p-16">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800">Submit a Repair Request</h2>
+
+            <div class="mb-4">
+                <label class="font-bold">Dormitory:</label>
+                <span class="ml-2 text-gray-700" id="dormName">Loading...</span>
+            </div>
+
+            <div class="mb-4">
+                <label class="font-bold">Room Number:</label>
+                <span class="ml-2 text-gray-700" id="roomNumber">Loading...</span>
+            </div>
+
+            <div class="mb-4">
+                <label for="repairType" class="block font-bold mb-1">Repair Type:</label>
+                <select id="repairType" name="category" class="w-full border border-gray-300 rounded px-3 py-2"
+                    required>
+                    <option value="">Select repair type</option>
+                    <option value="Electrical">Electrical</option>
+                    <option value="Plumbing">Plumbing</option>
+                    <option value="Furniture">Furniture</option>
+                    <option value="Air Conditioning">Air Conditioning</option>
+                    <option value="General">General</option>
+                </select>
+            </div>
+
+            <div class="mb-4">
+                <label for="durableArticles" class="block font-bold mb-1">Item:</label>
+                <input type="text" id="durableArticles" name="article"
+                    class="w-full border border-gray-300 rounded px-3 py-2" placeholder="e.g., Desk, Light" required />
+            </div>
+
+            <div class="mb-4">
+                <label for="damageDescription" class="block font-bold mb-1">Damage Description:</label>
+                <textarea id="damageDescription" name="description" rows="4" placeholder="Write a description..."
+                    class="w-full border border-gray-300 rounded px-3 py-2" required></textarea>
+            </div>
+
+            <div class="mb-4">
+                <label class="block font-bold mb-2">Photos:</label>
+                <label
+                    class="border border-dashed border-gray-400 rounded px-4 py-8 flex flex-col items-center justify-center cursor-pointer">
+                    <img id="imagePreview" src="" alt="Image Preview"
+                        class="hidden mb-4 w-40 h-40 object-cover rounded border border-gray-300" />
+                    <i class="fas fa-file-image fa-2x text-gray-400 mb-2"></i>
+                    <span id="fileLabel" class="text-gray-500">Select File</span>
+                    <input type="file" name="image" id="imageInput" accept=".jpg,.jpeg,.png" class="hidden" />
+                </label>
+                <p id="imageError" class="text-red-600 text-sm mt-2 hidden">Please upload a photo.</p>
+                <p class="text-xs text-gray-500 mt-1">Allowed: JPG, JPEG, PNG (Max 2MB)</p>
+            </div>
+
+
+
+
+            <div class="flex justify-center">
+                <button type="submit"
+                    class="mt-6 bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-6 rounded">
+                    Submit
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Error Modal -->
+    <div id="errorModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 z-50">
+        <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full text-center">
+            <h2 class="text-xl font-bold text-red-600 mb-4">Upload Error</h2>
+            <p id="errorMessage" class="text-gray-700 mb-6">Something went wrong.</p>
+            <button id="closeErrorModal" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
+                Close
+            </button>
+        </div>
+    </div>
+
+
+    <!-- Load and Activate Navbar -->
+    <script>
+        // Load Navbar HTML
+        fetch("/views/student/student_navbar.html")
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById("navbar-container").innerHTML = html;
+
+                // Wait until navbar is in DOM
+                setTimeout(() => {
+                    // ====== Elements ======
+                    const userBtn = document.getElementById("userBtn");
+                    const userDropdown = document.getElementById("userDropdown");
+                    const notificationBtn = document.getElementById("notificationBtn");
+                    const notificationDropdown = document.getElementById("notificationDropdown");
+                    const logoutModal = document.getElementById("logoutModal");
+                    const cancelLogout = document.getElementById("cancelLogout");
+                    const badge = document.getElementById("notificationCount");
+                    const allTab = document.getElementById("allTab");
+                    const unreadTab = document.getElementById("unreadTab");
+
+                    let currentTab = "all";
+
+                    // ====== Load student name ======
+                    fetch("/student/info")
+                        .then(res => res.json())
+                        .then(info => {
+                            document.getElementById("studentName").innerText = info.name;
+                        })
+                        .catch(() => {
+                            document.getElementById("studentName").innerText = "Student";
+                        });
+
+                    fetchNotifications();
+
+                    // ====== Dropdown Toggle ======
+                    userBtn?.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        notificationDropdown?.classList.add("hidden");
+                        userDropdown?.classList.toggle("hidden");
+                    });
+
+                    notificationBtn?.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        userDropdown?.classList.add("hidden");
+                        notificationDropdown?.classList.toggle("hidden");
+                        fetchNotifications(); // fetch when clicked
+                    });
+
+                    document.addEventListener("click", (event) => {
+                        if (!userDropdown.contains(event.target) && !userBtn.contains(event.target)) {
+                            userDropdown.classList.add("hidden");
+                        }
+                        if (!notificationDropdown.contains(event.target) && !notificationBtn.contains(event.target)) {
+                            notificationDropdown.classList.add("hidden");
+                        }
+                    });
+
+                    // ====== Logout Modal ======
+                    const logoutBtn = document.querySelector("#userDropdown button");
+                    logoutBtn?.addEventListener("click", () => {
+                        logoutModal?.classList.remove("hidden");
+                        logoutModal?.classList.add("flex");
+                    });
+
+                    cancelLogout?.addEventListener("click", () => {
+                        logoutModal?.classList.remove("flex");
+                        logoutModal?.classList.add("hidden");
+                    });
+
+                    // ====== Fetch Notifications ======
+                    // ====== Tabs ======
+                    function setActiveTab(tab) {
+                        if (tab === "all") {
+                            allTab.className = "px-3 py-1 text-sm rounded-full font-medium bg-blue-600 text-white";
+                            unreadTab.className = "px-3 py-1 text-sm rounded-full font-medium bg-gray-200 text-gray-700 hover:bg-gray-300";
+                        } else {
+                            unreadTab.className = "px-3 py-1 text-sm rounded-full font-medium bg-blue-600 text-white";
+                            allTab.className = "px-3 py-1 text-sm rounded-full font-medium bg-gray-200 text-gray-700 hover:bg-gray-300";
+                        }
+                    }
+
+                    allTab?.addEventListener("click", () => {
+                        currentTab = "all";
+                        setActiveTab("all");
+                        fetchNotifications();
+                    });
+
+                    unreadTab?.addEventListener("click", () => {
+                        currentTab = "unread";
+                        setActiveTab("unread");
+                        fetchNotifications();
+                    });
+
+                    const markAllReadBtn = document.getElementById("markAllRead");
+                    markAllReadBtn?.addEventListener("click", async () => {
+                        await fetch("/notifications/read-all", { method: "POST" });
+                        fetchNotifications();
+                    });
+
+                    function formatDateTime(dateString) {
+                        const date = new Date(dateString);
+
+                        // Format: DD/MM/YY HH:mm
+                        const day = String(date.getDate()).padStart(2, '0');
+                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                        const year = String(date.getFullYear()).slice(-2);
+                        const hours = String(date.getHours()).padStart(2, '0');
+                        const minutes = String(date.getMinutes()).padStart(2, '0');
+
+                        return `${day}/${month}/${year} ${hours}:${minutes}`;
+                    }
+
+
+                    // Icon mapping by notification title
+                    const iconMap = {
+                        "Repair Request Confirmed": { icon: "fa-wrench", color: "text-blue-500" },
+                        "Repair Request Updated": { icon: "fa-edit", color: "text-yellow-500" },
+                        "Repair Completed": { icon: "fa-check-circle", color: "text-green-500" }
+                    };
+
+                    async function fetchNotifications() {
+                        try {
+                            const res = await fetch('/student/notifications');
+                            if (!res.ok) throw new Error('Failed to fetch notifications');
+                            const data = await res.json();
+
+                            const list = document.querySelector('#notificationDropdown ul');
+                            const badge = document.getElementById('notificationCount');
+                            list.innerHTML = '';
+
+                            if (!data || data.length === 0) {
+                                list.innerHTML = `<li class="px-4 py-2 text-sm text-gray-500">No new notifications</li>`;
+                                badge.classList.add('hidden');
+                                return;
+                            }
+
+                            // ✅ Apply filter by tab
+                            let filtered = data;
+                            if (currentTab === "unread") {
+                                filtered = data.filter(n => n.is_read === 0);
+                            }
+
+                            if (filtered.length === 0) {
+                                list.innerHTML = `<li class="px-4 py-2 text-sm text-gray-500">No notifications</li>`;
+                                return;
+                            }
+
+                            filtered.forEach(noti => {
+                                // Pick icon from mapping, default to bell
+                                const { icon, color } = iconMap[noti.title] || { icon: "fa-bell", color: "text-gray-500" };
+
+                                const li = document.createElement('li');
+                                li.className =
+                                    "px-4 py-2 text-sm border-b cursor-pointer flex items-start space-x-3 " +
+                                    (noti.is_read === 0
+                                        ? "bg-gray-200 font-semibold text-red-600 hover:bg-gray-300"
+                                        : "bg-white text-gray-600 hover:bg-gray-100");
+
+                                li.innerHTML = `
+                <i class="fas ${icon} ${color} mt-1"></i>
+                <div class="flex-1">
+                    <div class="font-semibold">${noti.title}</div>
+                    <div class="text-xs text-gray-500">${noti.message || ''}</div>
+                    <div class="text-[10px] text-gray-400">${formatDateTime(noti.created_at)}</div>
+                </div>
+            `;
+
+                                li.addEventListener('click', async () => {
+                                    if (noti.link) window.location.href = noti.link;
+
+                                    await fetch('/notifications/read', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ notification_id: noti.notification_id })
+                                    });
+
+                                    fetchNotifications();
+                                });
+
+                                list.appendChild(li);
+                            });
+
+                            // Update badge count
+                            const unreadCount = data.filter(n => n.is_read === 0).length;
+                            if (unreadCount > 0) {
+                                badge.textContent = unreadCount;
+                                badge.classList.remove('hidden');
+                            } else {
+                                badge.classList.add('hidden');
+                            }
+                        } catch (err) {
+                            console.error(err);
+                        }
+                    }
+
+                    // Auto refresh every 30s
+                    setInterval(fetchNotifications, 30000);
+                }, 0);
+            });
+
+
+        // Show preview when user selects an image
+        document.addEventListener('DOMContentLoaded', () => {
+            const imageInput = document.getElementById('imageInput');
+            const imagePreview = document.getElementById('imagePreview');
+            const fileLabel = document.getElementById('fileLabel');
+            const fileIcon = document.querySelector('.fa-file-image'); // <== select the icon
+
+            imageInput.addEventListener('change', function () {
+                const file = this.files[0];
+
+                if (file) {
+                    const reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        imagePreview.src = e.target.result;
+                        imagePreview.classList.remove('hidden');
+                        fileLabel.textContent = 'Change File';
+                        fileIcon.classList.add('hidden'); // <== hide the icon
+                    };
+
+                    reader.readAsDataURL(file);
+                } else {
+                    imagePreview.src = '';
+                    imagePreview.classList.add('hidden');
+                    fileLabel.textContent = 'Select File';
+                    fileIcon.classList.remove('hidden'); // <== show the icon again
+                }
+            });
+        });
+
+
+
+
+        fetch('/student/profile-data')
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('dormName').innerText = data.dorm_name;
+                document.getElementById('roomNumber').innerText = data.room_number;
+            })
+            .catch(err => {
+                console.warn('Cannot load dorm info:', err);
+                document.getElementById('dormName').innerText = 'N/A';
+                document.getElementById('roomNumber').innerText = 'N/A';
+            });
+
+        const repairForm = document.getElementById('repairForm');
+        const imageInput = document.getElementById('imageInput');
+        const uploadLabel = imageInput.parentElement;
+        const imageError = document.getElementById('imageError');
+
+        imageInput.addEventListener('change', function () {
+            const file = this.files[0];
+
+            if (file) {
+                const maxSize = 2 * 1024 * 1024; // 2MB
+
+                if (!['image/jpeg', 'image/png'].includes(file.type)) {
+                    showErrorModal('Only JPG and PNG files are allowed.');
+                    this.value = ''; // reset input
+                    return;
+                }
+
+                if (file.size > maxSize) {
+                    showErrorModal('File size must be less than 2MB.');
+                    this.value = ''; // reset input
+                    return;
+                }
+
+
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    imagePreview.src = e.target.result;
+                    imagePreview.classList.remove('hidden');
+                    fileLabel.textContent = 'Change File';
+                    fileIcon.classList.add('hidden');
+                };
+                reader.readAsDataURL(file);
+            } else {
+                imagePreview.src = '';
+                imagePreview.classList.add('hidden');
+                fileLabel.textContent = 'Select File';
+                fileIcon.classList.remove('hidden');
+            }
+        });
+
+
+        repairForm.addEventListener('submit', function (e) {
+            if (!imageInput.files || imageInput.files.length === 0) {
+                e.preventDefault(); // Stop form submission
+                uploadLabel.classList.add('border-red-500'); // Highlight red
+                imageError.classList.remove('hidden'); // Show error message
+            }
+        });
+
+        imageInput.addEventListener('change', function () {
+            if (imageInput.files.length > 0) {
+                uploadLabel.classList.remove('border-red-500'); // Remove red highlight
+                imageError.classList.add('hidden'); // Hide error message
+            }
+        });
+
+        // ====== Modal Helpers ======
+        function showErrorModal(message) {
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorModal').classList.remove('hidden');
+            document.getElementById('errorModal').classList.add('flex');
+        }
+
+        document.getElementById('closeErrorModal').addEventListener('click', () => {
+            document.getElementById('errorModal').classList.add('hidden');
+            document.getElementById('errorModal').classList.remove('flex');
+        });
+
+    </script>
+</body>
+
+</html>

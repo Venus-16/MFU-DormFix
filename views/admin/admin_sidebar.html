@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Profile</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    html, body {
+        height: 100%;
+        font-family: sans-serif;
+    }
+    body {
+        display: flex;
+        flex-direction: column;
+    }
+    body>.d-flex {
+        flex: 1;
+        min-height: 0;
+    }
+    /* Navbar */
+    .navbarad {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #f5f5f5;
+        padding: 10px;
+        border-bottom: 1px solid #ccc;
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 60px;
+        z-index: 1050;
+    }
+    .navbar-left {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .logo {
+        border-radius: 50%;
+        height: 50px;
+        width: 50px;
+    }
+    .title {
+        font-size: 25px;
+        font-weight: bold;
+    }
+    .title .mfu {
+        color: red;
+        margin-right: 5px;
+    }
+    .title .dormfix {
+        color: #BB9945;
+    }
+    .navbar-right {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+    }
+    .user-info {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        font-size: 12px;
+        margin-right: 15px;
+        margin-left: 20px;
+    }
+    .name {
+        font-weight: bold;
+    }
+    .role {
+        color: gray;
+        font-size: 11px;
+    }
+    .profile-pic {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin-right: 20px;
+    }
+    /* Sidebar */
+    .tabs {
+        position: fixed;
+        top: 56px;
+        left: 0;
+        width: 150px;
+        height: calc(100vh - 56px);
+        background-color: #c62828;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        padding: 20px 0;
+        z-index: 1040;
+        overflow-y: auto;
+    }
+    .tabs p {
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+    .tab-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 8px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        text-decoration: none;
+        color: inherit;
+    }
+    .tab-item:hover {
+        background-color: #BB9945;
+        color: #3A7062;
+    }
+    .tab-item i {
+        font-size: 1.1rem;
+        width: 20px;
+        text-align: center;
+    }
+    .tab-item span {
+        white-space: nowrap;
+        font-size: 0.85rem;
+        font-weight: 400;
+    }
+    /* Logout Button */
+    .logout-wrapper {
+        display: flex;
+        justify-content: center;
+        margin-top: auto;
+    }
+    .logout {
+        width: 80%;
+        font-size: 0.8rem;
+        font-weight: bold;
+        background-color: #D9D9D9;
+        text-align: center;
+        padding: 10px;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+    }
+    .logout:hover {
+        background-color: #BB9945;
+    }
+    /* Sidebar collapsed style */
+    .tabs.collapsed {
+        width: 50px;
+    }
+    .tabs.collapsed .tab-item {
+        justify-content: center;
+        padding: 10px 0;
+    }
+    .tabs.collapsed .tab-item span {
+        display: none;
+    }
+    .tabs.collapsed .menu {
+        display: none;
+    }
+    .tabs.collapsed .logout-wrapper {
+        display: flex;
+    }
+    /* Toggle Button */
+    .toggle-btn {
+        font-size: 15px;
+        color: #333;
+        padding: 6px 10px;
+        transition: background-color 0.3s ease;
+        cursor: pointer;
+    }
+    .tabs.collapsed+.toggle-btn {
+        left: 70px;
+    }
+    .toggle-btn:hover {
+        background-color: #f0f0f0;
+    }
+    /* Optional: Tooltip when collapsed */
+    .tab-item[title] {
+        position: relative;
+    }
+    .tab-item[title]:hover::after {
+        content: attr(title);
+        position: absolute;
+        left: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+        background: #333;
+        color: white;
+        padding: 4px 8px;
+        font-size: 12px;
+        border-radius: 4px;
+        white-space: nowrap;
+        margin-left: 10px;
+        z-index: 999;
+    }
+    .main {
+        margin-left: 150px;
+        transition: margin-left 0.3s ease;
+        padding: 20px;
+    }
+    body.sidebar-collapsed .main {
+        margin-left: 50px;
+    }
+    .tabs.collapsed .logout {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 10px;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #D9D9D9;
+        font-size: 0;
+    }
+    .tabs.collapsed .logout::before {
+        content: "\f08b";
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        font-size: 16px;
+        color: #333;
+    }
+    .tab-item.active {
+        background-color: #f8f9fa;
+        color: #dc3545 !important;
+        font-weight: bold;
+        border-left: 4px solid #dc3545;
+    }
+    .tab-item.active i {
+        color: #dc3545 !important;
+    }
+    .tab-item.active {
+        background-color: #ffe0b2;
+        color: #ff9800;
+        border-left: 5px solid #ff9800;
+    }
+    @media (max-width: 767px) and (orientation: portrait) {
+        .navbar {
+            height: 60px;
+            padding-left: 5px !important;
+            padding-right: 5px !important;
+        }
+        .logo {
+            width: 30px;
+            height: 30px;
+        }
+        .navbar .title {
+            font-size: 15px;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .navbar .title .mfu,
+        .navbar .title .dormfix {
+            font-size: 15px;
+        }
+        .navbar .user-info .name {
+            font-size: 10px;
+        }
+        .navbar .user-info .role {
+            font-size: 8px;
+        }
+        .navbar .profile-pic {
+            width: 35px;
+            height: 35px;
+        }
+        .fa-bell {
+            font-size: 12px;
+        }
+        .toggle-btn i {
+            font-size: 15px;
+        }
+        .profile-pic {
+            width: 30px !important;
+            height: 28px !important;
+        }
+        .tabs {
+            width: 120px;
+        }
+        .menu {
+            font-size: 13px;
+        }
+        .tab-item i {
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        .tab-item span {
+            white-space: nowrap;
+            font-size: 0.7rem;
+            font-weight: 400;   
+        }
+    }
+.dropdown-fb {
+        position: fixed;
+        top: 75px;
+        right: 40px;
+        width: 350px;
+        background: #ffffff;
+        border: 2px solid #f7d86e;
+        border-radius: 18px;
+        box-shadow: 0 6px 24px #0002;
+        z-index: 3000;
+        display: none;
+        font-family: 'Segoe UI', Arial, sans-serif;
+        transition: box-shadow 0.2s;
+    }
+    .dropdown-fb.show {
+        display: block !important;
+    }
+    .dropdown-fb-header {
+        padding: 16px 20px 8px 20px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid #fae3a1;
+    }
+    .dropdown-fb-header .btn-link {
+        background: none;
+        border: none;
+        color: #1976d2;
+        font-size: 1rem;
+        cursor: pointer;
+        text-decoration: underline;
+    }
+    .dropdown-fb-tabs {
+        display: flex;
+        padding: 8px 20px;
+        gap: 10px;
+        border-bottom: 1px solid #fae3a1;
+    }
+    .fb-tab {
+        padding: 7px 22px;
+        border-radius: 20px;
+        border: none;
+        background: #f7e7b9;
+        font-weight: 500;
+        color: #25408f;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background 0.2s, color 0.2s;
+    }
+    .fb-tab.active {
+        background: #25408f;
+        color: #fff;
+        font-weight: bold;
+    }
+    .dropdown-fb-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        max-height: 340px;
+        overflow-y: auto;
+    }
+    .fb-noti-item {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        padding: 16px 22px 14px 22px;
+        border-bottom: 1px solid #f7e7b9;
+        background: #fffbe9;
+        position: relative;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    .fb-noti-item.unread {
+        background: #fff9e1;
+    }
+    .fb-noti-item.read {
+        background: #f3f2f2;
+        color: #aaa;
+    }
+    .fb-noti-top {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .fb-noti-icon {
+        font-size: 1.6rem;
+        margin-right: 2px;
+    }
+    .fb-noti-title {
+        font-weight: bold;
+        font-size: 1.08rem;
+        flex: 1;
+    }
+    .fb-noti-dot {
+        width: 11px;
+        height: 11px;
+        background: #1976d2;
+        border-radius: 50%;
+        margin-left: 7px;
+        margin-right: 2px;
+        display: inline-block;
+    }
+    .fb-noti-date {
+        font-size: 0.96rem;
+        color: #888;
+        margin-bottom: 2px;
+    }
+    .fb-noti-msg {
+        font-size: 0.97rem;
+        color: #444;
+        margin-bottom: 1px;
+    }
+    .dropdown-fb-footer {
+        padding: 12px 0;
+        text-align: center;
+        border-top: 1px solid #fae3a1;
+        background: #fffbe9;
+    }
+    .fb-seeall {
+        background: none;
+        border: none;
+        color: #1976d2;
+        font-size: 1rem;
+        cursor: pointer;
+        text-decoration: underline;
+    }
+    /* badge bell */
+    #notificationBtn .badge {
+        font-size: 1rem;
+        top: 2px;
+        left: 22px;
+        padding: 0 6px;
+    }
+    </style>
+</head>
+
+<body>
+    <!-- NAVBAR -->
+    <div class="navbar d-flex justify-content-between align-items-center">
+        <div class="navbar-left d-flex align-items-center">
+            <div class="toggle-btn" onclick="toggleSidebar()" style="cursor: pointer;">
+                <i class="fa-solid fa-bars fa-xl"></i>
+            </div>
+            <img src="/public/img/MFU.png" class="logo" />
+            <span class="title d-flex flex-row">
+                <span class="mfu fw-bold text-danger">MFU</span>
+                <span class="dormfix text-warning">DormFix</span>
+            </span>
+        </div>
+        <div class="navbar-right d-flex align-items-center">
+            <!-- Notification Bell -->
+            <button id="notificationBtn" class="btn position-relative me-3" style="background: none;">
+                <i class="fa-solid fa-bell"></i>
+                <span id="notificationCount"
+                      class="position-absolute badge rounded-pill bg-danger d-none">
+                </span>
+            </button>
+            <!-- User -->
+            <a href="#" class="d-flex align-items-center text-decoration-none text-dark">
+                <div class="user-info text-end">
+                    <div class="name fw-bold">Admin</div>
+                </div>
+                <img src="/public/img/satoru.jpg" class="profile-pic rounded-circle" />
+            </a>
+        </div>
+    </div>
+
+    <!-- Notification Dropdown (Facebook style) -->
+    <div id="notificationDropdown" class="dropdown-fb">
+        <div class="dropdown-fb-header">
+            <span>Notifications</span>
+            <button id="markAllAsReadBtn" class="btn-link">✓ Mark all as read</button>
+        </div>
+        <div class="dropdown-fb-tabs">
+            <button id="allNotiBtn" class="fb-tab active">All</button>
+            <button id="unreadNotiBtn" class="fb-tab">Unread</button>
+        </div>
+        <ul id="notificationList" class="dropdown-fb-list">
+            <li class="px-3 py-2 text-muted small">No new notifications</li>
+        </ul>
+        <!-- <div class="dropdown-fb-footer">
+            <button id="seeAllBtn" class="fb-seeall">See all notifications</button>
+        </div> -->
+    </div>
+
+    <!-- Sidebar -->
+    <div class="tabs">
+        <p class="menu px-3">MENU</p>
+        <a href="/admin/dashboard" class="tab-item">
+            <i class="fa-solid fa-chart-line"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="/admin/dormitory" class="tab-item">
+            <i class="fas fa-building"></i>
+            <span>Manage Dorm</span>
+        </a>
+        <a href="/admin/users" class="tab-item">
+            <i class="fas fa-users"></i>
+            <span>Manage User</span>
+        </a>
+        <a href="/admin/report" class="tab-item">
+            <i class="fa-solid fa-screwdriver-wrench"></i>
+            <span>Repair Report</span>
+        </a>
+        <a href="/admin/scheduled" class="tab-item">
+            <i class="fa-solid fa-calendar-days"></i>
+            <span>Repair Schedule</span>
+        </a>
+        <a href="/admin/history" class="tab-item">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            <span>History</span>
+        </a>
+        <div class="logout-wrapper">
+            <button type="button" class="logout" onclick="showLogoutModal()">
+                <i class="fa-solid fa-right-from-bracket"></i> Log out
+            </button>
+        </div>
+    </div>
+
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered custom-modal">
+            <div class="modal-content text-center p-4">
+                <h5 class="fw-bold mb-2 fs-2 py-4">Do you want to logout?</h5>
+                <div class="d-flex justify-content-center gap-5">
+                    <button type="button" class="btn btn-primary btn-lg fw-bold" onclick="handleLogout()">Yes</button>
+                    <button type="button" class="btn btn-danger btn-lg fw-bold" data-bs-dismiss="modal">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // Sidebar active
+    document.addEventListener('DOMContentLoaded', function () {
+        const currentPath = window.location.pathname;
+        const tabItems = document.querySelectorAll('.tab-item');
+        tabItems.forEach(item => {
+            if (item.getAttribute('href') === currentPath) {
+                item.classList.add('active');
+            }
+        });
+    });
+
+    function toggleSidebar() {
+        const sidebar = document.querySelector(".tabs");
+        const body = document.body;
+        sidebar.classList.toggle("collapsed");
+        body.classList.toggle("sidebar-collapsed");
+    }
+    function handleLogout() {
+        window.location.href = "/login";
+    }
+    function showLogoutModal() {
+        const modal = new bootstrap.Modal(document.getElementById("logoutModal"));
+        modal.show();
+    }
+
+    // -------- Facebook-style Notification Dropdown Logic --------
+    document.addEventListener('DOMContentLoaded', function () {
+        let allNotifications = [];
+        let filterType = "all";
+
+        // Icon mapping by type/title (customize as needed)
+        const notiIconMap = {
+    "completed": "fa-solid fa-circle-check text-success",   // Repair Request Completed
+    "updated": "fa-solid fa-pen-to-square text-warning",    // Repair Request Updated
+    "confirmed": "fa-solid fa-circle-info text-primary",    // Repair Request Confirmed
+    "cancelled": "fa-solid fa-ban text-danger",             // Repair Request Cancelled
+    "new_request": "fa-solid fa-hammer text-danger",        // New Repair Request
+    "default": "fa-solid fa-bell text-secondary"
+};
+
+function getNotiIcon(noti) {
+    if (noti.type && notiIconMap[noti.type]) return notiIconMap[noti.type];
+
+    if (/completed/i.test(noti.title)) return notiIconMap.completed;
+    if (/updated/i.test(noti.title)) return notiIconMap.updated;
+    if (/confirmed/i.test(noti.title)) return notiIconMap.confirmed;
+    if (/cancelled/i.test(noti.title)) return notiIconMap.cancelled;
+    if (/new request/i.test(noti.title)) return notiIconMap.new_request;
+
+    return notiIconMap.default;
+}
+
+
+        // Select elements
+        const notificationBtn = document.getElementById("notificationBtn");
+        const notificationDropdown = document.getElementById("notificationDropdown");
+        const notificationCount = document.getElementById("notificationCount");
+        const notificationList = document.getElementById("notificationList");
+        const markAllAsReadBtn = document.getElementById("markAllAsReadBtn");
+        const allNotiBtn = document.getElementById("allNotiBtn");
+        const unreadNotiBtn = document.getElementById("unreadNotiBtn");
+        const seeAllBtn = document.getElementById("seeAllBtn");
+
+        // Toggle dropdown
+        notificationBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            notificationDropdown.classList.toggle("show");
+            renderNotifications();
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener("click", (e) => {
+            if (!notificationDropdown.contains(e.target) && !notificationBtn.contains(e.target)) {
+                notificationDropdown.classList.remove("show");
+            }
+        });
+
+        function formatDateDMYHM(dateStr) {
+            const d = new Date(dateStr);
+            const day = String(d.getDate()).padStart(2, '0');
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const year = d.getFullYear();
+            let hour = d.getHours();
+            let min = String(d.getMinutes()).padStart(2, '0');
+            let ampm = "AM";
+            if (hour >= 12) {
+                ampm = "PM";
+                if (hour > 12) hour -= 12;
+            }
+            if (hour === 0) hour = 12;
+            return `${day}/${month}/${year} ${hour}:${min} ${ampm}`;
+        }
+
+        function renderNotifications() {
+            notificationList.innerHTML = "";
+            let filtered = filterType === "unread"
+                ? allNotifications.filter(n => n.is_read === 0)
+                : allNotifications;
+
+            if (filtered.length === 0) {
+                notificationList.innerHTML = `<li class="px-3 py-2 text-muted small">No notifications</li>`;
+                return;
+            }
+
+            filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            filtered.forEach(noti => {
+                const iconClass = getNotiIcon(noti);
+                const li = document.createElement("li");
+                li.className = `fb-noti-item ${noti.is_read === 0 ? "unread" : "read"}`;
+                li.innerHTML = `
+                    <div class="fb-noti-top">
+                        <i class="fb-noti-icon ${iconClass}"></i>
+                        <span class="fb-noti-title">${noti.title || ""}</span>
+                        ${noti.is_read === 0 ? `<span class="fb-noti-dot"></span>` : ""}
+                    </div>
+                    <span class="fb-noti-date">${formatDateDMYHM(noti.created_at)}</span>
+                    <span class="fb-noti-msg">${noti.message || ""}</span>
+                `;
+                li.addEventListener("click", async () => {
+                    await fetch("/admin/notifications/read", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ notification_id: noti.notification_id })
+                    });
+                    noti.is_read = 1;
+                    renderNotifications();
+                    updateNotificationCount();
+                    if (noti.link) {
+                        window.location.href = noti.link;
+                    }
+                });
+                notificationList.appendChild(li);
+            });
+        }
+
+        async function fetchNotifications() {
+            try {
+                const res = await fetch("/admin/notifications");
+                if (!res.ok) throw new Error("Failed to fetch");
+                const data = await res.json();
+                allNotifications = data;
+                renderNotifications();
+                updateNotificationCount();
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function updateNotificationCount() {
+            const unread = allNotifications.filter(n => n.is_read === 0).length;
+            if (unread > 0) {
+                notificationCount.textContent = unread;
+                notificationCount.classList.remove("d-none");
+            } else {
+                notificationCount.classList.add("d-none");
+            }
+        }
+
+        markAllAsReadBtn.addEventListener("click", async function () {
+            try {
+                await fetch('/admin/notifications/read-all', {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                await fetchNotifications();
+            } catch (e) {
+                console.error(e);
+            }
+        });
+
+        allNotiBtn.addEventListener("click", function () {
+            filterType = "all";
+            allNotiBtn.classList.add("active");
+            unreadNotiBtn.classList.remove("active");
+            renderNotifications();
+        });
+
+        unreadNotiBtn.addEventListener("click", function () {
+            filterType = "unread";
+            allNotiBtn.classList.remove("active");
+            unreadNotiBtn.classList.add("active");
+            renderNotifications();
+        });
+
+        seeAllBtn.addEventListener("click", function () {
+            window.location.href = "/admin/notifications/all"; // ปรับ route ตาม backend คุณ
+        });
+
+        fetchNotifications();
+        setInterval(fetchNotifications, 30000);
+    });
+    </script>
+</body>
+</html>

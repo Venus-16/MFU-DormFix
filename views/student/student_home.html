@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home page</title>
+    <link rel="shortcut icon" href="/public/img/MFU.png" type="image/x-icon">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        html,
+        body {
+            overflow-x: hidden;
+            margin: 0;
+
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 font-sans">
+
+    <!-- Navbar Placeholder -->
+    <div id="navbar-container"></div>
+
+    <section class="relative">
+        <img src="/public/img/home.jpg" alt="MFU Campus" class="w-full h-[350px] object-cover object-bottom" />
+    </section>
+
+    <section class="max-w-6xl mx-auto py-8 px-4 grid gap-6 grid-cols-1 md:grid-cols-3">
+        <div class="bg-red-600 text-white p-6 rounded-lg shadow hover:shadow-lg transition">
+            <h4 class="text-lg font-semibold mb-2">
+                <i class="fa-solid fa-file-import mr-3"></i>Submit a repair request
+            </h4>
+
+            <p class="text-sm mb-4">Quickly and easily report dormitory issues. Provide details about the problem right
+                here.</p>
+            <a href="/student/send" class="inline-flex items-center font-medium hover:underline">
+                Send <span class="ml-1">→</span>
+            </a>
+        </div>
+
+        <div class="bg-red-600 text-white p-6 rounded-lg shadow hover:shadow-lg transition">
+            <h4 class="text-lg font-semibold mb-2">
+                <i class="fa-solid fa-user-clock mr-3"></i>Track Repair Request Status
+            </h4>
+
+            <p class="text-sm mb-4">Get real-time updates on your repair request. Modify or cancel your request as
+                needed.</p>
+            <a href="/student/track" class="inline-flex items-center font-medium hover:underline">
+                Track <span class="ml-1">→</span>
+            </a>
+        </div>
+
+        <div class="bg-red-600 text-white p-6 rounded-lg shadow hover:shadow-lg transition">
+            <h4 class="text-lg font-semibold mb-2">
+                <i class="fa-solid fa-clock-rotate-left mr-3"></i>History
+            </h4>
+
+            <p class="text-sm mb-4">View all your past repair requests along with their details in one place.</p>
+            <a href="/student/history" class="inline-flex items-center font-medium hover:underline">
+                View <span class="ml-1">→</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- Load and Activate Navbar -->
+    <script>
+        // Load Navbar HTML
+        fetch("/views/student/student_navbar.html")
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById("navbar-container").innerHTML = html;
+
+                // Wait until navbar is in DOM
+                setTimeout(() => {
+                    // ====== Elements ======
+                    const userBtn = document.getElementById("userBtn");
+                    const userDropdown = document.getElementById("userDropdown");
+                    const notificationBtn = document.getElementById("notificationBtn");
+                    const notificationDropdown = document.getElementById("notificationDropdown");
+                    const logoutModal = document.getElementById("logoutModal");
+                    const cancelLogout = document.getElementById("cancelLogout");
+                    const badge = document.getElementById("notificationCount");
+                    const allTab = document.getElementById("allTab");
+                    const unreadTab = document.getElementById("unreadTab");
+
+                    let currentTab = "all";
+
+                    // ====== Load student name ======
+                    fetch("/student/info")
+                        .then(res => res.json())
+                        .then(info => {
+                            document.getElementById("studentName").innerText = info.name;
+                        })
+                        .catch(() => {
+                            document.getElementById("studentName").innerText = "Student";
+                        });
+
+                    fetchNotifications();
+
+                    // ====== Dropdown Toggle ======
+                    userBtn?.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        notificationDropdown?.classList.add("hidden");
+                        userDropdown?.classList.toggle("hidden");
+                    });
+
+                    notificationBtn?.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        userDropdown?.classList.add("hidden");
+                        notificationDropdown?.classList.toggle("hidden");
+                        fetchNotifications(); // fetch when clicked
+                    });
+
+                    document.addEventListener("click", (event) => {
+                        if (!userDropdown.contains(event.target) && !userBtn.contains(event.target)) {
+                            userDropdown.classList.add("hidden");
+                        }
+                        if (!notificationDropdown.contains(event.target) && !notificationBtn.contains(event.target)) {
+                            notificationDropdown.classList.add("hidden");
+                        }
+                    });
+
+                    // ====== Logout Modal ======
+                    const logoutBtn = document.querySelector("#userDropdown button");
+                    logoutBtn?.addEventListener("click", () => {
+                        logoutModal?.classList.remove("hidden");
+                        logoutModal?.classList.add("flex");
+                    });
+
+                    cancelLogout?.addEventListener("click", () => {
+                        logoutModal?.classList.remove("flex");
+                        logoutModal?.classList.add("hidden");
+                    });
+
+                    // ====== Fetch Notifications ======
+                    // ====== Tabs ======
+                    function setActiveTab(tab) {
+                        if (tab === "all") {
+                            allTab.className = "px-3 py-1 text-sm rounded-full font-medium bg-blue-600 text-white";
+                            unreadTab.className = "px-3 py-1 text-sm rounded-full font-medium bg-gray-200 text-gray-700 hover:bg-gray-300";
+                        } else {
+                            unreadTab.className = "px-3 py-1 text-sm rounded-full font-medium bg-blue-600 text-white";
+                            allTab.className = "px-3 py-1 text-sm rounded-full font-medium bg-gray-200 text-gray-700 hover:bg-gray-300";
+                        }
+                    }
+
+                    allTab?.addEventListener("click", () => {
+                        currentTab = "all";
+                        setActiveTab("all");
+                        fetchNotifications();
+                    });
+
+                    unreadTab?.addEventListener("click", () => {
+                        currentTab = "unread";
+                        setActiveTab("unread");
+                        fetchNotifications();
+                    });
+
+                    const markAllReadBtn = document.getElementById("markAllRead");
+                    markAllReadBtn?.addEventListener("click", async () => {
+                        await fetch("/notifications/read-all", { method: "POST" });
+                        fetchNotifications();
+                    });
+
+                    function formatDateTime(dateString) {
+                        const date = new Date(dateString);
+
+                        // Format: DD/MM/YY HH:mm
+                        const day = String(date.getDate()).padStart(2, '0');
+                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                        const year = String(date.getFullYear()).slice(-2);
+                        const hours = String(date.getHours()).padStart(2, '0');
+                        const minutes = String(date.getMinutes()).padStart(2, '0');
+
+                        return `${day}/${month}/${year} ${hours}:${minutes}`;
+                    }
+
+
+                    // Icon mapping by notification title
+                    const iconMap = {
+                        "Repair Request Confirmed": { icon: "fa-wrench", color: "text-blue-500" },
+                        "Repair Request Updated": { icon: "fa-edit", color: "text-yellow-500" },
+                        "Repair Completed": { icon: "fa-check-circle", color: "text-green-500" }
+                    };
+
+                    async function fetchNotifications() {
+                        try {
+                            const res = await fetch('/student/notifications');
+                            if (!res.ok) throw new Error('Failed to fetch notifications');
+                            const data = await res.json();
+
+                            const list = document.querySelector('#notificationDropdown ul');
+                            const badge = document.getElementById('notificationCount');
+                            list.innerHTML = '';
+
+                            if (!data || data.length === 0) {
+                                list.innerHTML = `<li class="px-4 py-2 text-sm text-gray-500">No new notifications</li>`;
+                                badge.classList.add('hidden');
+                                return;
+                            }
+
+                            // ✅ Apply filter by tab
+                            let filtered = data;
+                            if (currentTab === "unread") {
+                                filtered = data.filter(n => n.is_read === 0);
+                            }
+
+                            if (filtered.length === 0) {
+                                list.innerHTML = `<li class="px-4 py-2 text-sm text-gray-500">No notifications</li>`;
+                                return;
+                            }
+
+                            filtered.forEach(noti => {
+                                // Pick icon from mapping, default to bell
+                                const { icon, color } = iconMap[noti.title] || { icon: "fa-bell", color: "text-gray-500" };
+
+                                const li = document.createElement('li');
+                                li.className =
+                                    "px-4 py-2 text-sm border-b cursor-pointer flex items-start space-x-3 " +
+                                    (noti.is_read === 0
+                                        ? "bg-gray-200 font-semibold text-red-600 hover:bg-gray-300"
+                                        : "bg-white text-gray-600 hover:bg-gray-100");
+
+                                li.innerHTML = `
+                <i class="fas ${icon} ${color} mt-1"></i>
+                <div class="flex-1">
+                    <div class="font-semibold">${noti.title}</div>
+                    <div class="text-xs text-gray-500">${noti.message || ''}</div>
+                    <div class="text-[10px] text-gray-400">${formatDateTime(noti.created_at)}</div>
+                </div>
+            `;
+
+                                li.addEventListener('click', async () => {
+                                    if (noti.link) window.location.href = noti.link;
+
+                                    await fetch('/notifications/read', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ notification_id: noti.notification_id })
+                                    });
+
+                                    fetchNotifications();
+                                });
+
+                                list.appendChild(li);
+                            });
+
+                            // Update badge count
+                            const unreadCount = data.filter(n => n.is_read === 0).length;
+                            if (unreadCount > 0) {
+                                badge.textContent = unreadCount;
+                                badge.classList.remove('hidden');
+                            } else {
+                                badge.classList.add('hidden');
+                            }
+                        } catch (err) {
+                            console.error(err);
+                        }
+                    }
+
+                    // Auto refresh every 30s
+                    setInterval(fetchNotifications, 30000);
+                }, 0);
+            });
+    </script>
+
+
+</body>
+
+</html>

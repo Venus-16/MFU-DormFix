@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dormitory Staff List</title>
+  <link rel="shortcut icon" href="/public/img/MFU.png" type="image/x-icon">
+  <link rel="stylesheet" href="/public/css/staff/nav_bar_staff.css" />
+  <link rel="stylesheet" href="/public/css/staff/history_staff.css" />
+  <link rel="stylesheet" href="/public/css/admin/admin_list.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <style>
+    .loader-overlay {
+      position: fixed;
+      z-index: 9999;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: #fffbe9cc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .loader-overlay.hidden {
+      display: none;
+    }
+    .center-loader-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100vw;
+    }
+    .loader-visual {
+      --c1:#673b14;
+      --c2:#f8b13b;
+      width: 40px;
+      height: 80px;
+      border-top: 4px solid var(--c1);
+      border-bottom: 4px solid var(--c1);
+      background: linear-gradient(90deg, var(--c1) 2px, var(--c2) 0 5px,var(--c1) 0) 50%/7px 8px no-repeat;
+      display: grid;
+      overflow: hidden;
+      animation: l5-0 2s infinite linear;
+    }
+    .loader-visual::before,
+    .loader-visual::after {
+      content: "";
+      grid-area: 1/1;
+      width: 75%;
+      height: calc(50% - 4px);
+      margin: 0 auto;
+      border: 2px solid var(--c1);
+      border-top: 0;
+      box-sizing: content-box;
+      border-radius: 0 0 40% 40%;
+      -webkit-mask:
+        linear-gradient(#000 0 0) bottom/4px 2px no-repeat,
+        linear-gradient(#000 0 0);
+      -webkit-mask-composite: destination-out;
+              mask-composite: exclude;
+      background:
+        linear-gradient(var(--d,0deg),var(--c2) 50%,#0000 0) bottom /100% 205%,
+        linear-gradient(var(--c2) 0 0) center/0 100%;
+      background-repeat: no-repeat;
+      animation: inherit;
+      animation-name: l5-1;
+    }
+    .loader-visual::after {
+      transform-origin: 50% calc(100% + 2px);
+      transform: scaleY(-1);
+      --s:3px;
+      --d:180deg;
+    }
+    @keyframes l5-0 {
+      80%  {transform: rotate(0)}
+      100% {transform: rotate(0.5turn)}
+    }
+    @keyframes l5-1 {
+      10%,70%  {background-size:100% 205%,var(--s,0) 100%}
+      70%,100% {background-position: top,center}
+    }
+    .loader-text {
+      width: fit-content;
+      font-weight: bold;
+      font-family: monospace;
+      font-size: 30px;
+      clip-path: inset(0 3ch 0 0);
+      animation: l4 1s steps(4) infinite;
+      color: #673b14;
+      background: #fffbe9;
+      padding: 0.5em 1em;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px #f8b13b33;
+      margin-top: 32px; /* <-- Adjust vertical space below hourglass here */
+    }
+    .loader-text:before {
+      content: "Loading...";
+    }
+    @keyframes l4 {to{clip-path: inset(0 -1ch 0 0)}}
+
+    /* Notification Dropdown Style */
+                .dropdown-fb {
+            position: fixed;
+            top: 75px;
+            right: 40px;
+            width: 350px;
+            background: #ffffff;
+            border: 2px solid #f7d86e;
+            border-radius: 18px;
+            box-shadow: 0 6px 24px #0002;
+            z-index: 3000;
+            display: none;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            transition: box-shadow 0.2s;
+        }
+        .dropdown-fb.show {
+            display: block !important;
+        }
+        .dropdown-fb-header {
+            padding: 16px 20px 8px 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #fae3a1;
+        }
+        .dropdown-fb-header .btn-link {
+            background: none;
+            border: none;
+            color: #1976d2;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        .dropdown-fb-tabs {
+            display: flex;
+            padding: 8px 20px;
+            gap: 10px;
+            border-bottom: 1px solid #fae3a1;
+        }
+        .fb-tab {
+            padding: 7px 22px;
+            border-radius: 20px;
+            border: none;
+            background: #f7e7b9;
+            font-weight: 500;
+            color: #25408f;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.2s, color 0.2s;
+        }
+        .fb-tab.active {
+            background: #25408f;
+            color: #fff;
+            font-weight: bold;
+        }
+        .dropdown-fb-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            max-height: 340px;
+            overflow-y: auto;
+        }
+        .fb-noti-item {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            padding: 16px 22px 14px 22px;
+            border-bottom: 1px solid #f7e7b9;
+            background: #fffbe9;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .fb-noti-item.unread {
+            background: #fff9e1;
+        }
+        .fb-noti-item.read {
+            background: #f3f2f2;
+            color: #aaa;
+        }
+        .fb-noti-top {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .fb-noti-icon {
+            font-size: 1.6rem;
+            margin-right: 2px;
+        }
+        .fb-noti-title {
+            font-weight: bold;
+            font-size: 1.08rem;
+            flex: 1;
+        }
+        .fb-noti-dot {
+            width: 11px;
+            height: 11px;
+            background: #1976d2;
+            border-radius: 50%;
+            margin-left: 7px;
+            margin-right: 2px;
+            display: inline-block;
+        }
+        .fb-noti-date {
+            font-size: 0.96rem;
+            color: #888;
+            margin-bottom: 2px;
+        }
+        .fb-noti-msg {
+            font-size: 0.97rem;
+            color: #444;
+            margin-bottom: 1px;
+        }
+        .dropdown-fb-footer {
+            padding: 12px 0;
+            text-align: center;
+            border-top: 1px solid #fae3a1;
+            background: #fffbe9;
+        }
+        .fb-seeall {
+            background: none;
+            border: none;
+            color: #1976d2;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        #notificationBtn .badge {
+            font-size: 1rem;
+            top: 2px;
+            left: 22px;
+            padding: 0 6px;
+        }
+  </style>
+</head>
+
+<body>
+  <!-- Loader Overlay -->
+  <div id="loaderOverlay" class="loader-overlay hidden">
+    <div class="center-loader-container">
+      <div class="loader-visual"></div>
+      <div class="loader-text"></div>
+    </div>
+  </div>
+  <div id="navbar"></div>
+  <div class="d-flex" style="flex: 1;">
+    <div id="sidebar"></div>
+    <div class="main-content">
+      <div class="container py-5">
+        <h2>Dormitory Staff List</h2>
+        <div class="row mb-3">
+          <div class="col-md-3 mb-2">
+            <select id="filterDorm" class="form-select">
+              <option value="all">All Dormitories</option>
+            </select>
+          </div>
+          <div class="col-md-5 mb-2">
+            <div class="input-group input-group-sm shadow-sm rounded" style="background: #F5F5F5;">
+              <input type="search" class="form-control border-0" id="staffSearch" placeholder="Search by Email, Name, Phone..." />
+              <span class="input-group-text bg-transparent border-0">
+                <i class="fa-solid fa-magnifying-glass"></i>
+              </span>
+            </div>
+          </div>
+          <div class="col-md-4 text-end mb-2">
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addStaffModal"><i class="fa-solid fa-plus me-1"></i> Add</button>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#fileModal"><i class="fa-solid fa-file-excel me-1"></i> File</button>
+            <button type="button" class="btn btn-danger" id="disableSelectedBtn">
+              <i class="fa-solid fa-ban me-1"></i> Disable Selected
+            </button>
+          </div>
+        </div>
+        <table class="table table-bordered" id="staffTable">
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Name</th>
+              <th>Phone</th>
+              <th>Dormitory</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <!-- Add Staff Modal -->
+      <div class="modal fade" id="addStaffModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+          <form id="addStaffForm" class="modal-content" autocomplete="off">
+            <div class="modal-header">
+              <h5>Add Dormitory Staff</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              <label>Email:</label>
+              <input class="form-control mb-2" id="addEmail" type="email" required pattern="^[a-zA-Z0-9._%+-]+@mfu\.ac\.th$" title="Email must be @mfu.ac.th" />
+              <label>Name:</label>
+              <input class="form-control mb-2" id="addName" required />
+              <label>Phone:</label>
+              <input class="form-control mb-2" id="addPhone" required maxlength="10" minlength="10" pattern="^\d{10}$" title="Phone must be 10 digits" />
+              <label>Dormitory:</label>
+              <select class="form-select mb-2" id="addDorm" required>
+                <option value="">Dormitory</option>
+              </select>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-success">Add</button>
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Import Staff File Modal -->
+      <div class="modal fade" id="fileModal" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <form id="uploadStaffForm" class="modal-content" enctype="multipart/form-data" autocomplete="off">
+            <div class="modal-header">
+              <h5 class="modal-title" id="fileModalLabel">Upload Staff File</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              <p class="small">Supported formats: <strong>XLS, XLSX</strong></p>
+              <div class="border border-dashed border-secondary p-3 text-center mb-3">
+                <input type="file" class="form-control mb-2" id="fileInput" name="staffFile" accept=".xls,.xlsx" required />
+              </div>
+              <div class="d-flex align-items-center border rounded p-3 bg-light">
+                <i class="fa-solid fa-file-excel fa-xl text-success me-3"></i>
+                <div class="flex-grow-1">
+                  <div class="fw-bold mb-1">Table Example</div>
+                  <div class="small text-muted">You can download the attached example and use it as a starting point for your own file.</div>
+                </div>
+                <a href="/public/link/example_staff.xlsx" class="btn btn-outline-primary ms-3" download>Download</a>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button class="btn btn-primary" type="submit">Confirm</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Edit Staff Modal -->
+      <div class="modal fade" id="editStaffModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+          <form id="editStaffForm" class="modal-content" autocomplete="off">
+            <div class="modal-header">
+              <h5>Edit Dormitory Staff</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              <label>Email:</label>
+              <input class="form-control mb-2" id="editEmail" type="email" disabled />
+              <label>Name:</label>
+              <input class="form-control mb-2" id="editName" required />
+              <label>Phone:</label>
+              <input class="form-control mb-2" id="editPhone" required maxlength="10" minlength="10" pattern="^\d{10}$" title="Phone must be 10 digits" />
+              <label>Dormitory:</label>
+              <select class="form-select mb-2" id="editDorm" required></select>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-warning">Save</button>
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Modal Confirm Disable -->
+      <div class="modal fade" id="disableConfirmModal" tabindex="-1" aria-labelledby="disableConfirmLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title fw-bold" id="disableConfirmLabel">Confirm Disable</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <p id="disableConfirmText" class="mb-0">Are you sure you want to disable this item?</p>
+            </div>
+            <div class="modal-footer justify-content-end">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="button" class="btn btn-danger" id="confirmDisableBtn">Disable</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Disable หลายคน -->
+      <div class="modal fade" id="disableSelectedModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title fw-bold">Disable Staffs</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              <div class="mb-2">
+                <input type="search" class="form-control form-control-sm" id="disableSearch" placeholder="Search for staff...">
+              </div>
+              <table class="table table-bordered table-sm" id="disableStaffsTable">
+                <thead>
+                  <tr>
+                    <th><input type="checkbox" id="disableSelectAll"></th>
+                    <th>Email</th>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Dormitory</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- JS will render rows here -->
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+              <span id="disableCountInfo" class="me-auto text-muted small"></span>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="button" class="btn btn-danger" id="confirmDisableSelectedBtn" disabled>Disable Selected</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bootstrap Toast Notification -->
+      <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
+        <div id="mainToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="d-flex">
+            <div class="toast-body" id="mainToastBody"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal แสดงรายละเอียด Import -->
+<div class="modal fade" id="importResultDetailModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Import Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="importResultDetailBody"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+      <script>
+        // Loader control functions
+        function showLoader() {
+          document.getElementById('loaderOverlay').classList.remove('hidden');
+        }
+        function hideLoader() {
+          document.getElementById('loaderOverlay').classList.add('hidden');
+        }
+
+        let lastImportDetailHtml = "";
+
+function showToast(message, isSuccess = true, detailHtml = "") {
+  const toastDiv = document.getElementById('mainToast');
+  const toastBody = document.getElementById('mainToastBody');
+  toastBody.textContent = message;
+  toastDiv.classList.remove('bg-success', 'bg-danger');
+  toastDiv.classList.add(isSuccess ? 'bg-success' : 'bg-danger');
+  const toast = new bootstrap.Toast(toastDiv);
+  toast.show();
+
+  lastImportDetailHtml = detailHtml || "";
+
+  // ถ้ามีรายละเอียด ให้คลิก toast เพื่อเปิด modal
+  if (detailHtml) {
+    toastDiv.style.cursor = "pointer";
+    toastDiv.onclick = function() {
+      document.getElementById("importResultDetailBody").innerHTML = lastImportDetailHtml;
+      bootstrap.Modal.getOrCreateInstance(document.getElementById("importResultDetailModal")).show();
+    };
+  } else {
+    toastDiv.style.cursor = "";
+    toastDiv.onclick = null;
+  }
+}
+
+        async function fetchDorms(selectEl, selectedId = "") {
+          showLoader();
+          const res = await fetch('/api/dormitory');
+          const dorms = await res.json();
+          selectEl.innerHTML = '<option value="">Dormitory</option>';
+          dorms.forEach(d => {
+            selectEl.innerHTML += `<option value="${d.dorm_id}"${d.dorm_id == selectedId ? " selected" : ""}>${d.dorm_name}</option>`;
+          });
+          hideLoader();
+        }
+
+        let staffs = [];
+        let dorms = [];
+        let filteredStaffs = [];
+
+        async function loadDorms() {
+          showLoader();
+          const res = await fetch('/api/dormitory');
+          dorms = await res.json();
+          const filterDorm = document.getElementById('filterDorm');
+          filterDorm.innerHTML = `<option value="all">All Dormitories</option>`;
+          dorms.forEach(d => {
+            filterDorm.innerHTML += `<option value="${d.dorm_id}">${d.dorm_name}</option>`;
+          });
+          hideLoader();
+        }
+
+        // โหลด staff ทั้งหมด (filter status=1)
+        async function loadStaffs() {
+          showLoader();
+          const res = await fetch('/api/staffs');
+          let allStaffs = await res.json();
+          staffs = allStaffs.filter(s => s.status === 1 || s.status === "1");
+          renderStaffs();
+          hideLoader();
+        }
+
+        function renderStaffs() {
+          const filterValue = document.getElementById('filterDorm').value;
+          const searchTerm = document.getElementById('staffSearch').value.trim().toLowerCase();
+
+          let filtered = staffs;
+          if (filterValue !== "all") {
+            filtered = filtered.filter(staff => String(staff.dorm_id) === filterValue);
+          }
+          if (searchTerm) {
+            filtered = filtered.filter(staff =>
+              staff.email.toLowerCase().includes(searchTerm) ||
+              staff.name.toLowerCase().includes(searchTerm) ||
+              staff.phone_number.toLowerCase().includes(searchTerm) ||
+              staff.dorm_name.toLowerCase().includes(searchTerm)
+            );
+          }
+          filteredStaffs = filtered;
+          const tbody = document.querySelector("#staffTable tbody");
+          tbody.innerHTML = "";
+          filtered.forEach((staff, idx) => {
+            tbody.innerHTML += `
+              <tr>
+                <td>${staff.email}</td>
+                <td>${staff.name}</td>
+                <td>${staff.phone_number}</td>
+                <td>${staff.dorm_name}</td>
+                <td>
+                  <button class="btn btn-warning btn-sm edit-btn" data-idx="${idx}">Edit</button>
+                  <button class="btn btn-danger btn-sm disable-btn" data-idx="${idx}">Disable</button>
+                </td>
+              </tr>
+            `;
+          });
+        }
+
+        document.getElementById('filterDorm').addEventListener('change', renderStaffs);
+        document.getElementById('staffSearch').addEventListener('input', renderStaffs);
+
+        window.addEventListener('DOMContentLoaded', async () => {
+          showLoader();
+          await loadDorms();
+          await loadStaffs();
+          hideLoader();
+        });
+
+        // --- Add Staff ---
+        const addForm = document.getElementById("addStaffForm");
+        const addDorm = document.getElementById("addDorm");
+        document.getElementById("addStaffModal").addEventListener("show.bs.modal", async () => {
+          await fetchDorms(addDorm);
+        });
+        addForm.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          showLoader();
+          const email = document.getElementById("addEmail").value.trim();
+          const phone = document.getElementById("addPhone").value.trim();
+          if (!/^[a-zA-Z0-9._%+-]+@mfu\.ac\.th$/.test(email)) {
+            showToast("Email must be @mfu.ac.th only.", false);
+            hideLoader();
+            return;
+          }
+          if (!/^\d{10}$/.test(phone)) {
+            showToast("Phone must be exactly 10 digits.", false);
+            hideLoader();
+            return;
+          }
+          const data = {
+            email: email,
+            name: document.getElementById("addName").value.trim(),
+            phone_number: phone,
+            dorm_id: addDorm.value,
+          };
+          if (Object.values(data).some(v => !v)) {
+            showToast("Please fill all fields", false);
+            hideLoader();
+            return;
+          }
+          const res = await fetch('/api/staffs', { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
+          const result = await res.json();
+          if (result.success) {
+            await loadStaffs();
+            addForm.reset();
+            bootstrap.Modal.getInstance(document.getElementById("addStaffModal")).hide();
+            showToast("Staff added successfully!");
+          } else {
+            showToast(result.message || "Add staff failed!", false);
+          }
+          hideLoader();
+        });
+
+        // --- Edit Staff ---
+        let editingIdx = -1;
+        const editForm = document.getElementById("editStaffForm");
+        const editDorm = document.getElementById("editDorm");
+        document.querySelector("#staffTable tbody").addEventListener("click", async (e) => {
+          if (e.target.classList.contains("edit-btn")) {
+            showLoader();
+            editingIdx = +e.target.dataset.idx;
+            const staff = filteredStaffs[editingIdx];
+            document.getElementById("editEmail").value = staff.email;
+            document.getElementById("editName").value = staff.name;
+            document.getElementById("editPhone").value = staff.phone_number;
+            await fetchDorms(editDorm, staff.dorm_id);
+            bootstrap.Modal.getOrCreateInstance(document.getElementById("editStaffModal")).show();
+            hideLoader();
+          }
+        });
+
+        editForm.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          if (editingIdx < 0) return;
+          showLoader();
+          const staff = filteredStaffs[editingIdx];
+          const phone = document.getElementById("editPhone").value.trim();
+          if (!/^\d{10}$/.test(phone)) {
+            showToast("Phone must be exactly 10 digits.", false);
+            hideLoader();
+            return;
+          }
+          const data = {
+            name: document.getElementById("editName").value.trim(),
+            phone_number: phone,
+            dorm_id: editDorm.value,
+          };
+          if (Object.values(data).some(v => !v)) {
+            showToast("Please fill all fields", false);
+            hideLoader();
+            return;
+          }
+          const res = await fetch('/api/staffs/' + staff.staff_id, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
+          const result = await res.json();
+          if (result.success) {
+            await loadStaffs();
+            bootstrap.Modal.getInstance(document.getElementById("editStaffModal")).hide();
+            showToast("Staff updated successfully!");
+          } else {
+            showToast(result.message || "Edit staff failed!", false);
+          }
+          hideLoader();
+        });
+
+        // ======= Import Staff (AJAX!) =======
+        document.getElementById("uploadStaffForm").addEventListener("submit", async function(e){
+  e.preventDefault();
+  showLoader();
+  const fileInput = document.getElementById("fileInput");
+  if (!fileInput.files[0]) {
+    showToast("Please select a file!", false);
+    hideLoader();
+    return;
+  }
+  const formData = new FormData();
+  formData.append("staffFile", fileInput.files[0]);
+  try {
+    const res = await fetch("/api/staffs/import", {
+      method: "POST",
+      body: formData
+    });
+    const result = await res.json();
+
+    // เพิ่มตรงนี้สำหรับ detailHtml
+    let detailHtml = "";
+    // ถ้า API มี list ให้แสดงแบบละเอียด
+    if (result.importedList && result.importedList.length > 0) {
+      detailHtml += `<div><b>Imported staff (${result.importedList.length})</b></div>
+        <ul>
+          ${result.importedList.map(s => `<li>${s.email} - ${s.name}</li>`).join("")}
+        </ul>`;
+    }
+    if (result.failedRows && result.failedRows.length > 0) {
+      detailHtml += `<div class="mt-2"><b>Skipped staff (${result.failedRows.length})</b></div>
+        <ul>
+          ${result.failedRows.map(row => `<li>${row}</li>`).join("")}
+        </ul>`;
+    }
+
+    if (result.success) {
+      showToast(result.message || "Import Success!", !result.failedRows?.length, detailHtml);
+      await loadStaffs();
+      bootstrap.Modal.getInstance(document.getElementById("fileModal")).hide();
+      fileInput.value = "";
+    } else {
+      showToast(result.message || "Import failed!", false, detailHtml);
+    }
+  } catch(err) {
+    showToast("Import failed! " + err, false);
+  }
+  hideLoader();
+});
+
+        // ======= Disable Staff =======
+        let disableStaffIdx = -1;
+        document.querySelector("#staffTable tbody").addEventListener("click", function (e) {
+          if (e.target.classList.contains("disable-btn")) {
+            disableStaffIdx = +e.target.dataset.idx;
+            const staff = filteredStaffs[disableStaffIdx];
+            showDisableModal("single", staff.name, async () => {
+              showLoader();
+              const res = await fetch('/api/staffs/' + staff.staff_id, { method: "DELETE" });
+              const result = await res.json();
+              if (result.success) {
+                await loadStaffs();
+                showToast("Staff disabled!");
+              } else {
+                showToast(result.message || "Disable failed!", false);
+              }
+              disableStaffIdx = -1;
+              hideLoader();
+            });
+          }
+        });
+
+        // ======= Disable Selected =======
+        let disableSelectedChecked = new Set();
+
+        async function renderDisableStaffsTable() {
+          const tbody = document.querySelector("#disableStaffsTable tbody");
+          const search = document.getElementById("disableSearch").value.trim().toLowerCase();
+          let filtered = staffs;
+          if (search) {
+            filtered = filtered.filter(staff =>
+              staff.email.toLowerCase().includes(search) ||
+              staff.name.toLowerCase().includes(search) ||
+              staff.phone_number.toLowerCase().includes(search) ||
+              staff.dorm_name.toLowerCase().includes(search)
+            );
+          }
+          tbody.innerHTML = "";
+          filtered.forEach(staff => {
+            const checked = disableSelectedChecked.has(staff.staff_id) ? "checked" : "";
+            tbody.innerHTML += `
+              <tr>
+                <td><input type="checkbox" class="disable-checkbox" value="${staff.staff_id}" ${checked}></td>
+                <td>${staff.email}</td>
+                <td>${staff.name}</td>
+                <td>${staff.phone_number}</td>
+                <td>${staff.dorm_name}</td>
+              </tr>`;
+          });
+          updateDisableCountInfo();
+        }
+
+        function updateDisableCountInfo() {
+          document.getElementById("disableCountInfo").textContent =
+            `${disableSelectedChecked.size} staff(s) selected`;
+          document.getElementById("confirmDisableSelectedBtn").disabled = disableSelectedChecked.size === 0;
+        }
+
+        document.getElementById('disableSelectedBtn').addEventListener('click', function () {
+          disableSelectedChecked.clear();
+          document.getElementById("disableSearch").value = "";
+          renderDisableStaffsTable();
+          bootstrap.Modal.getOrCreateInstance(document.getElementById("disableSelectedModal")).show();
+        });
+
+        document.getElementById("disableSearch").addEventListener("input", renderDisableStaffsTable);
+
+        document.getElementById("disableStaffsTable").addEventListener("change", function (e) {
+          if (e.target.classList.contains("disable-checkbox")) {
+            const id = e.target.value;
+            if (e.target.checked) disableSelectedChecked.add(id);
+            else disableSelectedChecked.delete(id);
+            updateDisableCountInfo();
+            document.getElementById("confirmDisableSelectedBtn").disabled = disableSelectedChecked.size === 0;
+          }
+        });
+
+        document.getElementById("disableSelectAll").addEventListener("change", function (e) {
+          const checkboxes = document.querySelectorAll(".disable-checkbox");
+          if (e.target.checked) {
+            checkboxes.forEach(cb => { cb.checked = true; disableSelectedChecked.add(cb.value); });
+          } else {
+            checkboxes.forEach(cb => { cb.checked = false; disableSelectedChecked.delete(cb.value); });
+          }
+          updateDisableCountInfo();
+          document.getElementById("confirmDisableSelectedBtn").disabled = disableSelectedChecked.size === 0;
+        });
+
+        document.getElementById("confirmDisableSelectedBtn").addEventListener("click", function () {
+          if (disableSelectedChecked.size === 0) return;
+          bootstrap.Modal.getInstance(document.getElementById("disableSelectedModal")).hide();
+          showDisableModal("multi", `${disableSelectedChecked.size} staff(s)`, async () => {
+            showLoader();
+            let failed = 0;
+            for (const staff_id of disableSelectedChecked) {
+              const res = await fetch('/api/staffs/' + staff_id, { method: "DELETE" });
+              const result = await res.json();
+              if (!result.success) failed++;
+            }
+            await loadStaffs();
+            disableSelectedChecked.clear();
+            bootstrap.Modal.getOrCreateInstance(document.getElementById("disableSelectedModal")).hide();
+            if (failed === 0) {
+              showToast("Disabled selected staff!");
+            } else {
+              showToast(`Some staff could not be disabled (อาจติดข้อมูลเชื่อมโยงอื่นๆ)`, false);
+            }
+            hideLoader();
+          });
+        });
+
+        function showDisableModal(type, itemName, onDisable) {
+          let text = "";
+          if (type === "single") {
+            text = `Are you sure you want to <b>disable</b> <b>${itemName}</b>?`;
+          } else if (type === "multi") {
+            text = `Are you sure you want to <b>disable</b> <b>${itemName}</b>?`;
+          } else if (type === "all") {
+            text = `Are you sure you want to <b>disable ALL staff</b>?<br>If disabled, all staff records will disappear from view.`;
+          }
+          document.getElementById('disableConfirmText').innerHTML = text;
+
+          const modal = new bootstrap.Modal(document.getElementById('disableConfirmModal'));
+          modal.show();
+
+          const disableBtn = document.getElementById('confirmDisableBtn');
+          const newDisableHandler = function () {
+            modal.hide();
+            onDisable();
+            disableBtn.removeEventListener('click', newDisableHandler);
+          };
+          disableBtn.removeEventListener('click', newDisableHandler);
+          disableBtn.addEventListener('click', newDisableHandler);
+        }
+      </script>
+      <script>
+setTimeout(() => {
+  let allNotifications = [];
+  let filterType = "all";
+  // เลือก element
+  const notificationBtn = document.getElementById("notificationBtn");
+  const notificationDropdown = document.getElementById("notificationDropdown");
+  const notificationCount = document.getElementById("notificationCount");
+  const notificationList = document.getElementById("notificationList");
+  const markAllAsReadBtn = document.getElementById("markAllAsReadBtn");
+  const allNotiBtn = document.getElementById("allNotiBtn");
+  const unreadNotiBtn = document.getElementById("unreadNotiBtn");
+
+  // Toggle dropdown
+  notificationBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    notificationDropdown.classList.toggle("show");
+    renderNotifications();
+  });
+  // Close dropdown when clicking outside
+  document.addEventListener("click", (e) => {
+    if (!notificationDropdown.contains(e.target) && !notificationBtn.contains(e.target)) {
+      notificationDropdown.classList.remove("show");
+    }
+  });
+
+  function formatDateDMYHM(dateStr) {
+    const d = new Date(dateStr);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    let hour = d.getHours();
+    let min = String(d.getMinutes()).padStart(2, '0');
+    let ampm = "AM";
+    if (hour >= 12) {
+      ampm = "PM";
+      if (hour > 12) hour -= 12;
+    }
+    if (hour === 0) hour = 12;
+    return `${day}/${month}/${year} ${hour}:${min} ${ampm}`;
+  }
+
+  function renderNotifications() {
+    notificationList.innerHTML = "";
+    let filtered = [];
+    if (filterType === "unread") {
+      filtered = allNotifications.filter(n => n.is_read === 0);
+    } else {
+      filtered = allNotifications;
+    }
+    if (filtered.length === 0) {
+      notificationList.innerHTML = `<li class="px-3 py-2 text-muted small">No notifications</li>`;
+      return;
+    }
+    filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    filtered.forEach(noti => {
+                        const li = document.createElement("li");
+                        li.className =
+                            "px-3 py-2 small border-bottom cursor-pointer " +
+                            (noti.is_read === 0
+                                ? "bg-warning-subtle text-dark"
+                                : "bg-white text-muted");
+
+                        li.innerHTML = `
+                            <div class="fw-bold">${noti.title || ""}</div>
+                            <div class="fw-normal">${noti.message || ""}</div>
+
+                            <div class="small text-secondary">${formatDateDMYHM(noti.created_at)}</div>
+                        `;
+
+      li.addEventListener("click", async () => {
+        if (noti.link) window.location.href = noti.link;
+        await fetch("/admin/notifications/read", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ notification_id: noti.notification_id })
+        });
+        noti.is_read = 1;
+        renderNotifications();
+        updateNotificationCount();
+      });
+
+      notificationList.appendChild(li);
+    });
+  }
+
+  async function fetchNotifications() {
+    try {
+      const res = await fetch("/admin/notifications");
+      if (!res.ok) throw new Error("Failed to fetch");
+      const data = await res.json();
+      allNotifications = data;
+      renderNotifications();
+      updateNotificationCount();
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  function updateNotificationCount() {
+    const unread = allNotifications.filter(n => n.is_read === 0).length;
+    if (unread > 0) {
+      notificationCount.textContent = unread;
+      notificationCount.classList.remove("d-none");
+    } else {
+      notificationCount.classList.add("d-none");
+    }
+  }
+
+  markAllAsReadBtn.addEventListener("click", async function () {
+    try {
+      await fetch('/admin/notifications/read-all', {
+        method: 'POST',
+        credentials: 'include'
+      });
+      await fetchNotifications();
+    } catch (e) {
+      console.error(e);
+    }
+  });
+
+  allNotiBtn.addEventListener("click", function () {
+    filterType = "all";
+    allNotiBtn.classList.add("active");
+    unreadNotiBtn.classList.remove("active");
+    renderNotifications();
+  });
+
+  unreadNotiBtn.addEventListener("click", function () {
+    filterType = "unread";
+    allNotiBtn.classList.remove("active");
+    unreadNotiBtn.classList.add("active");
+    renderNotifications();
+  });
+
+  fetchNotifications();
+  setInterval(fetchNotifications, 30000);
+}, 300); // รอ navbar insert ก่อน
+
+        window.addEventListener("DOMContentLoaded", () => {
+          showLoader();
+          fetch('/admin/sidebar')
+            .then(res => res.text())
+            .then(data => {
+              const temp = document.createElement('div');
+              temp.innerHTML = data;
+
+              const navbar = temp.querySelector('.navbar');
+              const tabs = temp.querySelector('.tabs');
+              const logoutModal = temp.querySelector('#logoutModal');
+            const notificationDropdown = temp.querySelector('#notificationDropdown');
+
+            if (navbar) document.getElementById('navbar').appendChild(navbar);
+            if (tabs) document.getElementById('sidebar').appendChild(tabs);
+            if (logoutModal) document.body.appendChild(logoutModal);
+            if (notificationDropdown) document.body.appendChild(notificationDropdown);
+
+
+              window.toggleSidebar = function () {
+                const sidebar = document.querySelector(".tabs");
+                const body = document.body;
+                sidebar.classList.toggle("collapsed");
+                body.classList.toggle("sidebar-collapsed");
+              };
+
+              window.showLogoutModal = function () {
+                const modal = new bootstrap.Modal(document.getElementById('logoutModal'));
+                modal.show();
+              };
+
+              window.handleLogout = function () {
+                window.location.href = "/login";
+              };
+
+              const currentPath = window.location.pathname.replace(/^\/|\/$/g, '');
+              const tabItems = document.querySelectorAll('.tab-item');
+              tabItems.forEach(item => {
+                const itemHref = item.getAttribute('href');
+                if (itemHref) {
+                  const normalizedItemHref = itemHref.replace(/^\/|\/$/g, '');
+                  if (
+                    normalizedItemHref === currentPath ||
+                    (
+                      normalizedItemHref === 'admin/users' &&
+                      (
+                        currentPath === 'admin/user' ||
+                        currentPath === 'admin/tech' ||
+                        currentPath === 'admin/staff'
+                      )
+                    )
+                  ) {
+                    item.classList.add('active');
+                  }
+                }
+              });
+              hideLoader();
+            });
+
+        });
+      </script>
+</body>
+</html>

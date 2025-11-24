@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>History</title>
+    <link rel="shortcut icon" href="/public/img/MFU.png" type="image/x-icon">
+    <link rel="stylesheet" href="/public/css/staff/nav_bar_staff.css" />
+    <link rel="stylesheet" href="/public/css/staff/history_staff.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<body>
+    <div id="navbar"></div>
+    <div class="d-flex" style="flex: 1;">
+        <div id="sidebar"></div>
+        <div class="main-content">
+            <div class="container" id="main-content-area">
+                <div id="loading-overlay">
+                    <div class="loader-content">
+                        <div class="loading-icon" style="background-image: url('/public/img/loader-hourglass.svg');">
+                        </div>
+                        <div class="loading-text">Loading...</div>
+                    </div>
+                </div>
+                <div class="container py-5 mt-5">
+                    <h2>History</h2>
+                    <div class="d-flex align-items-center gap-4 mt-3" style="max-width: 900px;">
+                        <div class="d-flex flex-column" style="width: 180px;">
+                            <label for="dormitory" class="form-label mb-1"
+                                style="font-weight: 500; font-size: 0.85rem;">Dormitory</label>
+                            <select class="form-select form-select-sm" id="dormitory">
+                                <option value="">All Dormitories</option>
+                                <option value="Lamduan 7" selected>Lamduan 7</option>
+                                <option value="Lamduan 6">Lamduan 6</option>
+                                <option value="Lamduan 5">Lamduan 5</option>
+                                <option value="Lamduan 4">Lamduan 4</option>
+                                <option value="Lamduan 3">Lamduan 3</option>
+                                <option value="Lamduan 2">Lamduan 2</option>
+                                <option value="Lamduan 1">Lamduan 1</option>
+                            </select>
+                        </div>
+                        <div class="d-flex flex-column" style="width: 180px;">
+                            <label for="date" class="form-label mb-1"
+                                style="font-weight: 500; font-size: 0.85rem;">Date</label>
+                            <div class="input-group input-group-sm">
+                                <input type="date" class="form-control" id="date" />
+                                <span class="input-group-text"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Search by Section -->
+                    <div class="search-type-section d-flex align-items-end gap-2 mt-3">
+                        <label class="form-label mb-0"
+                            style="font-weight: 500; font-size: 0.85rem; min-width:75px;">Search
+                            by</label>
+                        <div id="search-type-btn-group" class="search-type-btn-group">
+                            <button class="search-type-btn active" data-type="all" type="button">All</button>
+                            <button class="search-type-btn" data-type="article" type="button">Item</button>
+                            <button class="search-type-btn" data-type="nameroom" type="button">Name or Room
+                                Number</button>
+                            <button class="search-type-btn" data-type="technician" type="button">Technician</button>
+                        </div>
+                        <!-- REPAIR TYPE DROPDOWN moved here -->
+                        <select class="repairtype-select ms-2" id="repairtype-dropdown" name="repairtype"
+                            style="width: 180px;">
+                            <option value="">All Repair Types</option>
+                        </select>
+                        <div id="search-bar-wrapper" class="flex-grow-1 show-all ms-2">
+                            <div id="search-bar-input-area">
+                                <div class="search-input-area search-input-all">
+                                    <div class="input-group input-group-sm shadow-sm rounded"
+                                        style="background: #F5F5F5;">
+                                        <input type="search" class="form-control border-0" id="search-all"
+                                            placeholder="Search anything..." autocomplete="off" />
+                                        <span class="input-group-text bg-transparent border-0">
+                                            <i class="fa-solid fa-magnifying-glass"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="search-input-area search-input-article">
+                                    <div class="input-group input-group-sm shadow-sm rounded"
+                                        style="background: #F5F5F5;">
+                                        <input type="search" class="form-control border-0" id="search-article"
+                                            placeholder="Search Item..." autocomplete="off" />
+                                        <span class="input-group-text bg-transparent border-0">
+                                            <i class="fa-solid fa-magnifying-glass"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="search-input-area search-input-nameroom">
+                                    <div class="input-group input-group-sm shadow-sm rounded"
+                                        style="background: #F5F5F5;">
+                                        <input type="search" class="form-control border-0" id="search-nameroom"
+                                            placeholder="Search Name, Room Number or Student ID..."
+                                            autocomplete="off" />
+                                        <span class="input-group-text bg-transparent border-0">
+                                            <i class="fa-solid fa-magnifying-glass"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="search-input-area search-input-technician">
+                                    <div class="input-group input-group-sm shadow-sm rounded"
+                                        style="background: #F5F5F5;">
+                                        <input type="search" class="form-control border-0" id="search-technician"
+                                            placeholder="Search Technician Name..." autocomplete="off" />
+                                        <span class="input-group-text bg-transparent border-0">
+                                            <i class="fa-solid fa-magnifying-glass"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="card-container" class="d-flex flex-column gap-4 mt-4"></div>
+                </div>
+            </div>
+        </div>
+        <script>
+            let currentSearchType = 'all';
+            // Loader functions, fetches from /loading, covers only main-content-area
+            function showLoaderContent() {
+                const overlay = document.getElementById('loading-overlay');
+                overlay.style.display = 'flex';
+                overlay.innerHTML = '';
+                document.body.classList.add('loading-active'); // Prevent scroll
+                fetch('/loading')
+                    .then(res => res.text())
+                    .then(html => {
+                        overlay.innerHTML = `<div class="loader-content">${html}</div>`;
+                        overlay.style.background = '#fffbe9'; // สีเหลืองอ่อนทึบ
+                    });
+            }
+            function hideLoaderContent() {
+                const overlay = document.getElementById('loading-overlay');
+                overlay.style.display = 'none';
+                overlay.innerHTML = '';
+                overlay.style.background = '';
+                document.body.classList.remove('loading-active');
+            }
+
+            // ---- Notification Logic (เหมือนของ navbar) ----
+            let allNotifications = [];
+            let filterType = "all"; // "all" or "unread"
+
+            function formatDateDMYHM(dateStr) {
+                const d = new Date(dateStr);
+                const day = String(d.getDate()).padStart(2, '0');
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const year = d.getFullYear();
+                let hour = d.getHours();
+                let min = String(d.getMinutes()).padStart(2, '0');
+                let ampm = "AM";
+                if (hour >= 12) {
+                    ampm = "PM";
+                    if (hour > 12) hour -= 12;
+                }
+                if (hour === 0) hour = 12;
+                return `${day}/${month}/${year} ${hour}:${min} ${ampm}`;
+            }
+
+            function renderNotifications() {
+                const notificationList = document.getElementById("notificationList");
+                const notificationCount = document.getElementById("notificationCount");
+                let filtered = [];
+                if (filterType === "unread") {
+                    filtered = allNotifications.filter(n => n.is_read === 0);
+                } else {
+                    filtered = allNotifications;
+                }
+
+                notificationList.innerHTML = "";
+                if (filtered.length === 0) {
+                    notificationList.innerHTML = `<li class="px-3 py-2 text-muted small">No notifications</li>`;
+                    return;
+                }
+
+                filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+                filtered.forEach(noti => {
+                    const li = document.createElement("li");
+                    li.className =
+                        "px-3 py-2 small border-bottom cursor-pointer " +
+                        (noti.is_read === 0
+                            ? "bg-warning-subtle text-dark"
+                            : "bg-white text-muted");
+
+                    li.innerHTML = `
+                        <div class="fw-bold">${noti.title || ""}</div>
+                        <div class="fw-normal">${noti.message || ""}</div>
+                        <div class="small text-secondary">${formatDateDMYHM(noti.created_at)}</div>
+                    `;
+
+                    li.addEventListener("click", async () => {
+                        await fetch("/staff/notifications/read", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ notification_id: noti.notification_id })
+                        });
+                        noti.is_read = 1;
+                        renderNotifications();
+                        updateNotificationCount();
+                        if (noti.link) {
+                            window.location.href = noti.link;
+                        }
+                    });
+
+                    notificationList.appendChild(li);
+                });
+            }
+
+            async function fetchNotifications() {
+                try {
+                    const res = await fetch("/staff/notifications");
+                    if (!res.ok) throw new Error("Failed to fetch");
+                    const data = await res.json();
+                    allNotifications = data;
+                    renderNotifications();
+                    updateNotificationCount();
+                } catch (err) {
+                    console.error(err);
+                }
+            }
+
+            function updateNotificationCount() {
+                const notificationCount = document.getElementById("notificationCount");
+                const unread = allNotifications.filter(n => n.is_read === 0).length;
+                if (unread > 0) {
+                    notificationCount.textContent = unread;
+                    notificationCount.classList.remove("d-none");
+                } else {
+                    notificationCount.classList.add("d-none");
+                }
+            }
+
+            function setupNotificationEvents() {
+                const notificationBtn = document.getElementById("notificationBtn");
+                const notificationDropdown = document.getElementById("notificationDropdown");
+                const markAllAsReadBtn = document.getElementById("markAllAsReadBtn");
+                const allNotiBtn = document.getElementById("allNotiBtn");
+                const unreadNotiBtn = document.getElementById("unreadNotiBtn");
+
+                if (!notificationBtn || !notificationDropdown) return;
+                notificationBtn.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    notificationDropdown.style.display =
+                        notificationDropdown.style.display === "block" ? "none" : "block";
+                    renderNotifications();
+                });
+
+                document.addEventListener("click", (e) => {
+                    if (!notificationDropdown.contains(e.target) && !notificationBtn.contains(e.target)) {
+                        notificationDropdown.style.display = "none";
+                    }
+                });
+
+                if (markAllAsReadBtn) {
+                    markAllAsReadBtn.addEventListener("click", async function () {
+                        try {
+                            await fetch('/staff/notifications/read-all', {
+                                method: 'POST',
+                                credentials: 'include'
+                            });
+                            await fetchNotifications();
+                        } catch (e) {
+                            console.error(e);
+                        }
+                    });
+                }
+
+                if (allNotiBtn && unreadNotiBtn) {
+                    allNotiBtn.addEventListener("click", function () {
+                        filterType = "all";
+                        allNotiBtn.classList.add("active");
+                        unreadNotiBtn.classList.remove("active");
+                        renderNotifications();
+                    });
+
+                    unreadNotiBtn.addEventListener("click", function () {
+                        filterType = "unread";
+                        allNotiBtn.classList.remove("active");
+                        unreadNotiBtn.classList.add("active");
+                        renderNotifications();
+                    });
+                }
+            }
+
+            window.addEventListener("DOMContentLoaded", () => {
+                // Loader only on first load, for 1 second
+                showLoaderContent();
+
+                // Fill dropdowns in parallel, then hide loader after at least 1 second
+                const repairTypePromise = fetch('/staff/repairtypes')
+                    .then(res => res.json())
+                    .then(data => {
+                        const dropdown = document.getElementById('repairtype-dropdown');
+                        dropdown.innerHTML = '<option value="">All Repair Types</option>';
+                        data.forEach(type => {
+                            const opt = document.createElement('option');
+                            opt.value = type;
+                            opt.textContent = type;
+                            dropdown.appendChild(opt);
+                        });
+                    });
+
+                // Navbar & sidebar (with notification bell logic)
+                const navbarPromise = fetch('/staff/nevbar')
+                    .then(res => res.text())
+                    .then(data => {
+                        const temp = document.createElement('div');
+                        temp.innerHTML = data;
+
+                        const navbar = temp.querySelector('.navbar');
+                        const tabs = temp.querySelector('.tabs');
+                        const logoutModal = temp.querySelector('#logoutModal');
+
+                        if (navbar) document.getElementById('navbar').appendChild(navbar);
+                        if (tabs) document.getElementById('sidebar').appendChild(tabs);
+                        if (logoutModal) document.body.appendChild(logoutModal);
+
+                        fetch('/staff/nevbar_name')
+                            .then(res => {
+                                if (!res.ok) throw new Error("Failed to fetch name");
+                                return res.json();
+                            })
+                            .then(data => {
+                                const navName = document.getElementById('nav-name');
+                                if (navName) navName.textContent = data.name;
+                            })
+                            .catch(() => {
+                                const navName = document.getElementById('nav-name');
+                                if (navName) navName.textContent = "Staff";
+                            });
+
+                        window.toggleSidebar = function () {
+                            const sidebar = document.querySelector(".tabs");
+                            const body = document.body;
+                            sidebar.classList.toggle("collapsed");
+                            body.classList.toggle("sidebar-collapsed");
+                        };
+
+                        window.showLogoutModal = function () {
+                            const modal = new bootstrap.Modal(document.getElementById('logoutModal'));
+                            modal.show();
+                        };
+
+                        window.handleLogout = function () {
+                            fetch('/logout', {
+                                method: 'POST',
+                                credentials: 'include'
+                            })
+                                .then(() => {
+                                    window.location.href = "/logout";
+                                });
+                        };
+                        const currentPath = window.location.pathname;
+                        const tabItems = document.querySelectorAll('.tab-item');
+                        tabItems.forEach(item => {
+                            const itemHref = item.getAttribute('href');
+                            if (itemHref) {
+                                const normalizedItemHref = itemHref.endsWith('/') ? itemHref.slice(0, -1) : itemHref;
+                                const normalizedCurrentPath = currentPath.endsWith('/') ? currentPath.slice(0, -1) : currentPath;
+                                if (normalizedCurrentPath.startsWith(normalizedItemHref)) {
+                                    item.classList.add('active');
+                                }
+                            }
+                        });
+
+                        // ----------- Notification Bell Setup for AJAX Navbar --------------
+                        setTimeout(() => {
+                            setupNotificationEvents();
+                            fetchNotifications();
+                            setInterval(fetchNotifications, 30000);
+                        }, 100);
+                        // -------------------------------------------------------------------
+                    });
+
+                // Wait for dropdowns & navbar, then at least 1s before hiding
+                Promise.all([repairTypePromise, navbarPromise]).then(() => {
+                    setTimeout(() => {
+                        hideLoaderContent();
+                        loadHistoryReports();
+                    }, 1000);
+                });
+
+                // Filter events
+                document.getElementById('dormitory').addEventListener('change', loadHistoryReports);
+                document.getElementById('date').addEventListener('change', loadHistoryReports);
+                document.getElementById('repairtype-dropdown').addEventListener('change', loadHistoryReports);
+
+                // Search type buttons
+                const btnGroup = document.getElementById('search-type-btn-group');
+                const searchBarWrapper = document.getElementById('search-bar-wrapper');
+                btnGroup.addEventListener('click', function (e) {
+                    const btn = e.target.closest('.search-type-btn');
+                    if (!btn) return;
+                    btnGroup.querySelectorAll('.search-type-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentSearchType = btn.dataset.type;
+                    searchBarWrapper.className = "flex-grow-1 " +
+                        (currentSearchType === "all" ? "show-all" :
+                            currentSearchType === "article" ? "show-article" :
+                                currentSearchType === "technician" ? "show-technician" : "show-name-room");
+                    setTimeout(() => {
+                        if (currentSearchType === 'all') {
+                            document.getElementById('search-all').focus();
+                        } else if (currentSearchType === 'article') {
+                            document.getElementById('search-article').focus();
+                        } else if (currentSearchType === 'nameroom') {
+                            document.getElementById('search-nameroom').focus();
+                        } else if (currentSearchType === 'technician') {
+                            document.getElementById('search-technician').focus();
+                        }
+                    }, 100);
+                    loadHistoryReports();
+                });
+
+                // Search input listeners
+                document.getElementById('search-bar-input-area').addEventListener('input', function (e) {
+                    if (e.target.id === 'search-all' && currentSearchType === 'all') {
+                        loadHistoryReports();
+                    } else if (e.target.id === 'search-article' && currentSearchType === 'article') {
+                        loadHistoryReports();
+                    } else if (e.target.id === 'search-nameroom' && currentSearchType === 'nameroom') {
+                        loadHistoryReports();
+                    } else if (e.target.id === 'search-technician' && currentSearchType === 'technician') {
+                        loadHistoryReports();
+                    }
+                });
+            });
+
+            function generateStars(score) {
+                const rating = parseInt(score);
+                if (isNaN(rating)) return "No feedback";
+                let stars = "";
+                for (let i = 1; i <= 5; i++) {
+                    stars += i <= rating
+                        ? '<i class="fa-solid fa-star" style="color: #ffc107;"></i>'
+                        : '<i class="fa-regular fa-star" style="color: #ccc;"></i>';
+                }
+                return stars;
+            }
+
+            function loadHistoryReports() {
+                // No loader here!
+                const dormName = document.getElementById('dormitory').value;
+                const date = document.getElementById('date').value;
+                const repairtype = document.getElementById('repairtype-dropdown').value;
+
+                let url = '/staff/history1?dormName=' + encodeURIComponent(dormName);
+                if (date) url += '&date=' + encodeURIComponent(date);
+                if (repairtype) url += '&repairtype=' + encodeURIComponent(repairtype);
+
+                fetch(url)
+                    .then(res => {
+                        if (!res.ok) throw new Error('No history found.');
+                        return res.json();
+                    })
+                    .then(data => {
+                        renderHistoryCards(data);
+                    })
+                    .catch(err => {
+                        document.getElementById("card-container").innerHTML =
+                            `<div class="alert alert-info">${err.message}</div>`;
+                    });
+            }
+            function renderHistoryCards(reports) {
+                const container = document.getElementById("card-container");
+                container.innerHTML = "";
+
+                // Filter ด้วย search ฝั่ง frontend แบบแยกตามปุ่ม
+                let search = "";
+                if (currentSearchType === "all") {
+                    search = document.getElementById('search-all').value.trim().toLowerCase();
+                    if (search) {
+                        reports = reports.filter(report => {
+                            const concat = [
+                                report.student_name || '',
+                                report.dorm || '',
+                                report.room_number || '',
+                                report.category || '',
+                                report.article || '',
+                                report.description || '',
+                                report.technician_name || '',
+                                report.technician_phone || '',
+                                report.status || '',
+                                report.feedback_comment || '',
+                                report.comment || '',
+                                report.work_description || ''
+                            ].join(' ').toLowerCase();
+                            return concat.includes(search);
+                        });
+                    }
+                } else if (currentSearchType === "article") {
+                    search = document.getElementById('search-article').value.trim().toLowerCase();
+                    if (search) {
+                        reports = reports.filter(report =>
+                            (report.article || '').toLowerCase().includes(search)
+                        );
+                    }
+                } else if (currentSearchType === "nameroom") {
+                    search = document.getElementById('search-nameroom').value.trim().toLowerCase();
+                    if (search) {
+                        reports = reports.filter(report =>
+                            (report.student_name || '').toLowerCase().includes(search) ||
+                            (report.room_number || '').toLowerCase().includes(search) ||
+                            (report.student_id || '').toLowerCase().includes(search)
+                        );
+                    }
+                } else if (currentSearchType === "technician") {
+                    search = document.getElementById('search-technician').value.trim().toLowerCase();
+                    if (search) {
+                        reports = reports.filter(report =>
+                            (report.technician_name || '').toLowerCase().includes(search)
+                        );
+                    }
+                }
+
+                if (!reports || reports.length === 0) {
+                    container.innerHTML = '<div class="alert alert-info">No completed or cancelled repair requests were found.</div>';
+                    return;
+                }
+
+                reports.forEach(report => {
+                    const isCanceled = report.status && report.status.toLowerCase() === "cancel";
+                    const isCompleted = report.status && report.status.toLowerCase() === "completed";
+                    if (!isCanceled && !isCompleted) return;
+
+                    let imageSrc = report.image || '';
+                    if (imageSrc && imageSrc.startsWith('uploads/')) {
+                        imageSrc = '/public/' + imageSrc;
+                    }
+                    if (!imageSrc) {
+                        imageSrc = '/public/img/no-image.png';
+                    }
+
+                    const feedbackScore = report.feedback_score || report.rating;
+                    const feedbackComment = report.feedback_comment || report.comment;
+                    const technicianName = report.technician_name || '-';
+                    const technicianPhone = report.technician_phone || report.phone_number || '-';
+                    const headTechName = report.headtech_name || "-";
+
+                    const card = document.createElement("div");
+                    card.className = "card shadow-sm mx-auto";
+                    card.style.background = "#e9e9e9";
+                    card.style.borderRadius = "15px";
+                    card.style.padding = "20px";
+                    card.style.width = "1100px";
+
+                    const statusColor = isCanceled ? "#dc3545" : "#30BD71";
+
+                    card.innerHTML = `
+                    <div class="row align-items-start" style="font-size: 0.85rem; line-height: 1.8;">
+                        <div class="col-4 d-flex justify-content-center align-items-center">
+                            <img src="${imageSrc}" alt="Image"
+                                 style="width: 100%; border-radius: 12px; max-height: 250px; object-fit: cover;">
+                        </div>
+                        <div class="col-3 d-flex flex-column justify-content-start">
+                            <p class="mb-1"><strong>Name:</strong> ${report.student_name || '-'}</p>
+                            <p class="mb-1"><strong>Dormitory:</strong> ${report.dorm || '-'}</p>
+                            <p class="mb-1"><strong>Room:</strong> ${report.room_number || '-'}</p>
+                            <p class="mb-1"><strong>Request Date:</strong> ${formatDate(report.request_date)}</p>
+                            ${isCompleted ? `<p class="mb-1"><strong>Repair Date:</strong> ${formatDate(report.repair_date) || "-"}</p>` : ""}
+                            ${isCompleted ? `<p class="mb-1"><strong>Completed Date:</strong> ${formatDate(report.complete_date) || "-"}</p>` : ""}
+                            ${isCompleted && feedbackScore ? `<p class="mb-1"><strong>Feedback:</strong> ${generateStars(feedbackScore)}</p>` : ""}
+                            ${isCompleted && feedbackComment ? `<p class="mb-1"><strong>Comment:</strong> ${feedbackComment}</p>` : ""}
+                        </div>
+                        <div class="col-5 d-flex flex-column justify-content-start">
+                            ${isCompleted && headTechName !== '-' ? `<p class="mb-1"><strong>Assigned By:</strong> ${headTechName}</p>` : ""}
+                            ${isCompleted && technicianName !== '-' ? `<p class="mb-1"><strong>Technician:</strong> ${technicianName}</p>` : ""}
+                            ${isCompleted && technicianPhone !== '-' ? `<p class="mb-1"><strong>Phone:</strong> ${technicianPhone}</p>` : ""}
+                            <p class="mb-1"><strong>Repair Type:</strong> ${report.category || '-'}</p>
+                            <p class="mb-1"><strong>Item:</strong> ${report.article || '-'}</p>
+                            <p class="mb-1"><strong>Damage Description:</strong> ${report.description || '-'}</p>
+                            ${isCompleted && report.work_description ? `<p class="mb-1"><strong>Work Description:</strong> ${report.work_description}</p>` : ""}
+                            <div class="mt-3">
+                                <span style="display: inline-block; background-color: ${statusColor}; color: white; font-weight: 600; border-radius: 20px; padding: 6px 20px; width: 150px; text-align: center;">
+                                    ${report.status}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                    container.appendChild(card);
+                });
+            }
+
+            function formatDate(dateStr) {
+                if (!dateStr) return '-';
+                const date = new Date(dateStr);
+                if (isNaN(date)) return dateStr;
+                // AM/PM ตัวใหญ่
+                let hours = date.getHours();
+                const minutes = date.getMinutes().toString().padStart(2, '0');
+                const day = date.getDate().toString().padStart(2, '0');
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                const year = date.getFullYear();
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                hours = hours ? hours : 12;
+                const hourStr = hours.toString().padStart(2, '0');
+                return `${day}/${month}/${year}, ${hourStr}:${minutes} ${ampm}`;
+            }
+        </script>
+</body>
+
+</html>

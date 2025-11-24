@@ -1,0 +1,286 @@
+.main-content {
+    margin-left: 160px;
+    width: calc(100% - 200px);
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+body.sidebar-collapsed .main-content {
+    margin-left: 50px;
+}
+
+.search-type-section {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 12px;
+}
+
+.search-type-btn-group {
+    display: flex;
+    flex-wrap: nowrap !important;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.search-type-btn {
+    display: inline-block;
+    padding: 0.4em 1.5em;
+    min-width: unset;
+    margin-right: 0;
+    margin-bottom: 0;
+    white-space: nowrap;
+    border-radius: 1.8rem;
+    font-size: 1.05rem;
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s, border 0.2s;
+    border: 1.5px solid #d0cde1;
+    background: #f8f9fa;
+    color: #495057;
+    line-height: 1.2;
+}
+
+.search-type-btn.active,
+.search-type-btn:focus {
+    background: #9379C2 !important;
+    color: #fff !important;
+    border-color: #9379C2 !important;
+}
+
+.search-type-btn:disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+#search-bar-wrapper {
+    width: 100%;
+    min-width: 180px;
+}
+
+.search-input-area {
+    display: none;
+}
+
+.show-all .search-input-all,
+.show-article .search-input-article,
+.show-name-room .search-input-nameroom,
+.show-technician .search-input-technician {
+    display: block;
+}
+
+/* Loader overlay styles - covers only main-content-area */
+#loading-overlay {
+    position: absolute;
+    left: 0;
+    top: 50px !important;
+    right: 0;
+    bottom: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: #fffbe9 !important;
+    /* สีเหลืองอ่อน ไม่โปร่งใส */
+    z-index: 9999;
+}
+
+
+
+
+/* Prevent loader overlay from inheriting global font styles */
+#loading-overlay,
+#loading-overlay * {
+    font-family: inherit !important;
+    font-weight: inherit !important;
+    color: inherit !important;
+}
+
+/* Loader content styles - use only local classes */
+#loading-overlay .loader-content {
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Example loader icon and text style (edit as needed) */
+#loading-overlay .loader-content .loading-icon {
+    width: 64px;
+    height: 64px;
+    background: url("/public/img/loader-hourglass.svg") no-repeat center/contain;
+    margin-bottom: 16px;
+}
+
+#loading-overlay .loader-content .loading-text {
+    font-size: 2.3rem;
+    color: #8d6e3a;
+    font-family: 'Prompt', 'Kanit', Arial, sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+}
+
+#main-content-area {
+    position: relative;
+    /* เพิ่มบรรทัดนี้ */
+    min-height: 10vh;
+}
+
+.repairtype-select {
+    min-width: 170px;
+    max-width: 210px;
+    border-radius: 1.5rem;
+    font-size: 1rem;
+    border: 1.5px solid #d0cde1;
+    padding: 0.25rem 1.5rem 0.25rem 0.75rem;
+    background: #f8f9fa;
+    margin-left: 0.5rem;
+}
+
+@media (max-width: 1024px) {
+    #loading-overlay {
+        top: 48px;
+        left: 45px !important;
+        height: calc(100vh - 48px);
+    }
+}
+
+@media (max-width: 768px) {
+    #loading-overlay {
+        top: 48px;
+        left: 135px !important;
+        height: calc(100vh - 48px);
+    }
+
+    .main-content {
+        margin-left: 10px;
+        width: calc(100% - 20px);
+        padding: 10px;
+    }
+
+    .main-content .card {
+        width: 100% !important;
+        padding: 10px !important;
+    }
+
+    .main-content .row {
+        flex-direction: column;
+    }
+
+    .main-content .col-4,
+    .main-content .col-3,
+    .main-content .col-5 {
+        width: 100% !important;
+        margin-bottom: 15px;
+    }
+
+    /* ปรับปรุง search by section */
+    .search-type-section {
+        flex-direction: column;
+        align-items: flex-start;
+        /* จัดเรียงชิดซ้าย */
+        gap: 0.5rem;
+        margin-top: 12px;
+        width: 100%;
+        /* เพิ่มเพื่อให้เต็มความกว้าง */
+    }
+
+    .search-type-btn-group {
+        flex-direction: column;
+        /* เปลี่ยนเป็น column เพื่อให้แต่ละปุ่มขึ้นบรรทัดใหม่ */
+        align-items: flex-start;
+        /* จัดเรียงชิดซ้าย */
+        gap: 0.5rem;
+        width: 100%;
+        /* เพิ่มเพื่อให้เต็มความกว้าง */
+    }
+
+    .search-type-btn {
+        padding: 0.3em 1em;
+        /* ลดขนาด padding */
+        font-size: 0.9rem;
+        /* ลดขนาด font */
+        white-space: normal;
+        /* ให้ข้อความขึ้นบรรทัดใหม่ได้ */
+        width: 100%;
+        /* ทำให้ปุ่มเต็มความกว้าง */
+    }
+
+    .repairtype-select {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    /* ปรับขนาดของ input ใน search bar */
+    .search-bar-wrapper .form-control {
+        font-size: 0.9rem;
+    }
+
+    .main-content img {
+        max-height: 200px !important;
+        width: 100% !important;
+        object-fit: cover;
+        border-radius: 10px;
+    }
+
+    .main-content span {
+        width: 100% !important;
+        padding: 8px 0 !important;
+    }
+
+}
+
+#main-content-area {
+    position: relative;
+    min-height: 10vh;
+}
+
+#loading-overlay {
+    position: absolute;
+    /* Place overlay below the navbar/tabbar */
+    top: 0;
+    /* Change this value to match your navbar height */
+    left: 0;
+    width: 100%;
+    height: calc(100vh - 56px);
+    /* Overlay only the area below navbar/tabbar */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.85);
+    z-index: 9999;
+}
+
+#loading-overlay .loader-content {
+    padding: 2rem 3rem;
+    border-radius: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* Prevent loader overlay from inheriting global font styles */
+#loading-overlay,
+#loading-overlay * {
+    font-family: inherit !important;
+    font-weight: inherit !important;
+    color: inherit !important;
+}
+
+/* Example loader icon and text style (edit as needed) */
+#loading-overlay .loader-content .loading-icon {
+    width: 64px;
+    height: 64px;
+    background: url("/public/img/loader-hourglass.svg") no-repeat center/contain;
+    margin-bottom: 16px;
+}
+
+#loading-overlay .loader-content .loading-text {
+    font-size: 2.3rem;
+    color: #8d6e3a;
+    font-family: 'Prompt', 'Kanit', Arial, sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+}

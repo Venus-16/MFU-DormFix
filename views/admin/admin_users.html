@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manage User</title>
+    <link rel="shortcut icon" href="/public/img/MFU.png" type="image/x-icon">
+    <link rel="stylesheet" href="/public/css/staff/nav_bar_staff.css" />
+    <link rel="stylesheet" href="/public/css/staff/history_staff.css" />
+    <link rel="stylesheet" href="/public/css/admin/admin_dorm.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <style>
+    .user-card {
+      padding: 30px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: box-shadow 0.3s;
+    }
+    .user-card:hover {
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    }
+    a.text-decoration-none:hover .user-card {
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
+}
+    /* Added responsive adjustments for text and icons */
+    .user-card .fs-1 {
+        font-size: 3rem !important; /* Default large size */
+    }
+    @media (max-width: 576px) { /* For small devices (phones) */
+        .user-card {
+            padding: 20px; /* Reduce padding on smaller screens */
+        }
+        .user-card .fs-1 {
+            font-size: 2rem !important; /* Smaller icon size */
+            margin-right: 15px !important; /* Adjust margin */
+        }
+        .user-card h4 {
+            font-size: 1.2rem; /* Adjust heading size */
+            white-space: normal; /* Allow text to wrap */
+        }
+    }
+
+    /* Notification Dropdown Style */
+                .dropdown-fb {
+            position: fixed;
+            top: 75px;
+            right: 40px;
+            width: 350px;
+            background: #ffffff;
+            border: 2px solid #f7d86e;
+            border-radius: 18px;
+            box-shadow: 0 6px 24px #0002;
+            z-index: 3000;
+            display: none;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            transition: box-shadow 0.2s;
+        }
+        .dropdown-fb.show {
+            display: block !important;
+        }
+        .dropdown-fb-header {
+            padding: 16px 20px 8px 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #fae3a1;
+        }
+        .dropdown-fb-header .btn-link {
+            background: none;
+            border: none;
+            color: #1976d2;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        .dropdown-fb-tabs {
+            display: flex;
+            padding: 8px 20px;
+            gap: 10px;
+            border-bottom: 1px solid #fae3a1;
+        }
+        .fb-tab {
+            padding: 7px 22px;
+            border-radius: 20px;
+            border: none;
+            background: #f7e7b9;
+            font-weight: 500;
+            color: #25408f;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.2s, color 0.2s;
+        }
+        .fb-tab.active {
+            background: #25408f;
+            color: #fff;
+            font-weight: bold;
+        }
+        .dropdown-fb-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            max-height: 340px;
+            overflow-y: auto;
+        }
+        .fb-noti-item {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            padding: 16px 22px 14px 22px;
+            border-bottom: 1px solid #f7e7b9;
+            background: #fffbe9;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .fb-noti-item.unread {
+            background: #fff9e1;
+        }
+        .fb-noti-item.read {
+            background: #f3f2f2;
+            color: #aaa;
+        }
+        .fb-noti-top {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .fb-noti-icon {
+            font-size: 1.6rem;
+            margin-right: 2px;
+        }
+        .fb-noti-title {
+            font-weight: bold;
+            font-size: 1.08rem;
+            flex: 1;
+        }
+        .fb-noti-dot {
+            width: 11px;
+            height: 11px;
+            background: #1976d2;
+            border-radius: 50%;
+            margin-left: 7px;
+            margin-right: 2px;
+            display: inline-block;
+        }
+        .fb-noti-date {
+            font-size: 0.96rem;
+            color: #888;
+            margin-bottom: 2px;
+        }
+        .fb-noti-msg {
+            font-size: 0.97rem;
+            color: #444;
+            margin-bottom: 1px;
+        }
+        .dropdown-fb-footer {
+            padding: 12px 0;
+            text-align: center;
+            border-top: 1px solid #fae3a1;
+            background: #fffbe9;
+        }
+        .fb-seeall {
+            background: none;
+            border: none;
+            color: #1976d2;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        #notificationBtn .badge {
+            font-size: 1rem;
+            top: 2px;
+            left: 22px;
+            padding: 0 6px;
+        }
+  </style>
+</head>
+<body>
+  <div id="navbar"></div>
+    <div class="d-flex" style="flex: 1;">
+        <div id="sidebar"></div>
+  <div class="main-content">
+            <div class="container py-2 mt-2">
+                <h2>Manage User</h2>
+
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-12">
+        <a href="/admin/user" class="text-decoration-none">
+            <div class="user-card bg-danger text-white d-flex align-items-center">
+            <i class="bi bi-mortarboard-fill fs-1 me-4"></i>
+            <h4 class="mb-0">STUDENTS</h4>
+          </div>
+        </a>
+          
+        </div>
+        <div class="col-12">
+        <a href="/admin/staff" class="text-decoration-none">
+            <div class="user-card bg-warning text-dark d-flex align-items-center">
+            <i class="bi bi-people-fill fs-1 me-4"></i>
+            <h4 class="mb-0">DORMITORY STAFF</h4>
+          </div>
+        </a>
+        </div>
+        <div class="col-12">
+        <a href="/admin/tech" class="text-decoration-none">
+            <div class="user-card bg-secondary text-white d-flex align-items-center">
+            <i class="bi bi-gear-fill fs-1 me-4"></i>
+            <h4 class="mb-0">TECHNICIANS</h4>
+          </div>
+        </a>
+   
+      </div>
+    </div>
+  </div>
+  <script>
+    // ---- Notification JS ----
+setTimeout(() => {
+  let allNotifications = [];
+  let filterType = "all";
+  // เลือก element
+  const notificationBtn = document.getElementById("notificationBtn");
+  const notificationDropdown = document.getElementById("notificationDropdown");
+  const notificationCount = document.getElementById("notificationCount");
+  const notificationList = document.getElementById("notificationList");
+  const markAllAsReadBtn = document.getElementById("markAllAsReadBtn");
+  const allNotiBtn = document.getElementById("allNotiBtn");
+  const unreadNotiBtn = document.getElementById("unreadNotiBtn");
+
+  // Toggle dropdown
+  notificationBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    notificationDropdown.classList.toggle("show");
+    renderNotifications();
+  });
+  // Close dropdown when clicking outside
+  document.addEventListener("click", (e) => {
+    if (!notificationDropdown.contains(e.target) && !notificationBtn.contains(e.target)) {
+      notificationDropdown.classList.remove("show");
+    }
+  });
+
+  function formatDateDMYHM(dateStr) {
+    const d = new Date(dateStr);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    let hour = d.getHours();
+    let min = String(d.getMinutes()).padStart(2, '0');
+    let ampm = "AM";
+    if (hour >= 12) {
+      ampm = "PM";
+      if (hour > 12) hour -= 12;
+    }
+    if (hour === 0) hour = 12;
+    return `${day}/${month}/${year} ${hour}:${min} ${ampm}`;
+  }
+
+  function renderNotifications() {
+    notificationList.innerHTML = "";
+    let filtered = [];
+    if (filterType === "unread") {
+      filtered = allNotifications.filter(n => n.is_read === 0);
+    } else {
+      filtered = allNotifications;
+    }
+    if (filtered.length === 0) {
+      notificationList.innerHTML = `<li class="px-3 py-2 text-muted small">No notifications</li>`;
+      return;
+    }
+    filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    filtered.forEach(noti => {
+                        const li = document.createElement("li");
+                        li.className =
+                            "px-3 py-2 small border-bottom cursor-pointer " +
+                            (noti.is_read === 0
+                                ? "bg-warning-subtle text-dark"
+                                : "bg-white text-muted");
+
+                        li.innerHTML = `
+                            <div class="fw-bold">${noti.title || ""}</div>
+                            <div class="fw-normal">${noti.message || ""}</div>
+
+                            <div class="small text-secondary">${formatDateDMYHM(noti.created_at)}</div>
+                        `;
+
+      li.addEventListener("click", async () => {
+        if (noti.link) window.location.href = noti.link;
+        await fetch("/admin/notifications/read", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ notification_id: noti.notification_id })
+        });
+        noti.is_read = 1;
+        renderNotifications();
+        updateNotificationCount();
+      });
+
+      notificationList.appendChild(li);
+    });
+  }
+
+  async function fetchNotifications() {
+    try {
+      const res = await fetch("/admin/notifications");
+      if (!res.ok) throw new Error("Failed to fetch");
+      const data = await res.json();
+      allNotifications = data;
+      renderNotifications();
+      updateNotificationCount();
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  function updateNotificationCount() {
+    const unread = allNotifications.filter(n => n.is_read === 0).length;
+    if (unread > 0) {
+      notificationCount.textContent = unread;
+      notificationCount.classList.remove("d-none");
+    } else {
+      notificationCount.classList.add("d-none");
+    }
+  }
+
+  markAllAsReadBtn.addEventListener("click", async function () {
+    try {
+      await fetch('/admin/notifications/read-all', {
+        method: 'POST',
+        credentials: 'include'
+      });
+      await fetchNotifications();
+    } catch (e) {
+      console.error(e);
+    }
+  });
+
+  allNotiBtn.addEventListener("click", function () {
+    filterType = "all";
+    allNotiBtn.classList.add("active");
+    unreadNotiBtn.classList.remove("active");
+    renderNotifications();
+  });
+
+  unreadNotiBtn.addEventListener("click", function () {
+    filterType = "unread";
+    allNotiBtn.classList.remove("active");
+    unreadNotiBtn.classList.add("active");
+    renderNotifications();
+  });
+
+  fetchNotifications();
+  setInterval(fetchNotifications, 30000);
+}, 300);
+
+window.addEventListener("DOMContentLoaded", () => {
+            // โหลด navbar และ sidebar จากไฟล์แยก
+            fetch('/admin/sidebar')
+                .then(res => res.text())
+                .then(data => {
+                    const temp = document.createElement('div');
+                    temp.innerHTML = data;
+
+                    const navbar = temp.querySelector('.navbar');
+                    const tabs = temp.querySelector('.tabs');
+                    const logoutModal = temp.querySelector('#logoutModal');
+const notificationDropdown = temp.querySelector('#notificationDropdown');
+
+            if (navbar) document.getElementById('navbar').appendChild(navbar);
+            if (tabs) document.getElementById('sidebar').appendChild(tabs);
+            if (logoutModal) document.body.appendChild(logoutModal);
+            if (notificationDropdown) document.body.appendChild(notificationDropdown);
+
+                    window.toggleSidebar = function () {
+                        const sidebar = document.querySelector(".tabs");
+                        const body = document.body;
+                        sidebar.classList.toggle("collapsed");
+                        body.classList.toggle("sidebar-collapsed");
+                    };
+
+                    window.showLogoutModal = function () {
+                        const modal = new bootstrap.Modal(document.getElementById('logoutModal'));
+                        modal.show();
+                    };
+
+                    window.handleLogout = function () {
+                        window.location.href = "/login";
+                    };
+
+                    const currentPath = window.location.pathname;
+                    const tabItems = document.querySelectorAll('.tab-item');
+
+                    tabItems.forEach(item => {
+                        const itemHref = item.getAttribute('href');
+                        if (itemHref) {
+                            const normalizedItemHref = itemHref.endsWith('/') ? itemHref.slice(0, -1) : itemHref;
+                            const normalizedCurrentPath = currentPath.endsWith('/') ? currentPath.slice(0, -1) : currentPath;
+
+                            if (normalizedCurrentPath.startsWith(normalizedItemHref)) {
+                                item.classList.add('active');
+                            }
+                        }
+                    });
+                });})
+</script>
+<script src="/app.js"></script>
+
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</body>
+</html>

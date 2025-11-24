@@ -1,0 +1,67 @@
+.position-relative input.form-control {
+    padding-left: 2.5rem;
+}
+
+.position-relative .bi-search {
+    font-size: 1rem;
+}
+
+.table tbody i {
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.table tbody i:hover {
+    filter: brightness(85%);
+}
+
+#photoModal {
+    z-index: 1060;
+}
+
+.modal-backdrop {
+    z-index: 1040;
+}
+
+.modal-backdrop+.modal-backdrop {
+    z-index: 1041;
+}
+
+#photoModal .modal-body {
+    overflow: auto;
+}
+
+.content-container {
+    padding-top: 70px;
+    transition: margin-left 0.3s ease;
+    padding-right: 20px;
+    padding-left: 40px;
+    max-width: 1200px;
+    margin-right: auto;
+    margin-left: 180px;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+    body.sidebar-open .content-container {
+        margin-left: 190px;
+        /* เพิ่มระยะห่าง */
+    }
+}
+
+@media (max-width: 767px) {
+    body.sidebar-open .content-container {
+        margin-left: 180px;
+        /* เพิ่มระยะห่าง */
+    }
+}
+
+.photo-modal-img {
+    cursor: zoom-in;
+    transition: transform 0.2s;
+}
+
+.photo-modal-img.zoomed {
+    cursor: zoom-out;
+    transform: scale(2);
+    z-index: 1000;
+}

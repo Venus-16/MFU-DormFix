@@ -1,0 +1,103 @@
+.main-content {
+    margin-left: 160px;
+    width: calc(100% - 200px);
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+body.sidebar-collapsed .main-content {
+    margin-left: 50px;
+}
+
+/* เพิ่มเพื่อให้ขยับตาม sidebar-open */
+body.sidebar-open .main-content {
+    margin-left: 160px !important;
+    transition: all 0.3s;
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+    .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+        padding: 0;
+    }
+
+    .container {
+        max-width: 98vw;
+        padding: 32px 2vw 24px 2vw;
+    }
+}
+
+/* iPad-specific padding */
+@media (max-width: 900px) {
+    .container {
+        max-width: 95vw;
+        padding: 20px 2vw 20px 2vw;
+    }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+    .main-content {
+        margin-left: 0 !important;
+        width: 100vw !important;
+        padding: 0 !important;
+    }
+
+    .container {
+        max-width: 100vw;
+        padding: 12px 6vw 12px 6vw;
+    }
+
+    .main-content .card {
+        width: 100vw !important;
+        padding: 12px !important;
+        margin: 0 auto 16px auto !important;
+        box-sizing: border-box;
+    }
+
+    .main-content .row {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .main-content .col-4,
+    .main-content .col-3,
+    .main-content .col-5 {
+        width: 100% !important;
+        margin-bottom: 10px;
+    }
+
+    .main-content img {
+        max-height: 180px !important;
+        width: 100% !important;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    .main-content span {
+        width: 100% !important;
+        padding: 8px 0 !important;
+    }
+
+    .d-flex.align-items-center.gap-4.mt-3 {
+        flex-direction: column !important;
+        gap: 8px !important;
+        margin: 0;
+        padding: 0;
+        width: 100% !important;
+        max-width: 100vw !important;
+    }
+}
+
+/* For smallest screens */
+@media (max-width: 390px) {
+    .container {
+        padding: 6px 2vw 6px 2vw;
+    }
+
+    .main-content .card {
+        padding: 6px !important;
+    }
+}

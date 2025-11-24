@@ -1,0 +1,352 @@
+.card h2 {
+    font-size: 2.2rem;
+    margin-top: 10px;
+    color: #333;
+}
+
+.card h5 {
+    font-weight: 600;
+    color: #444;
+}
+
+.card small {
+    font-size: 0.85rem;
+}
+
+.list-group-item span {
+    font-weight: bold;
+    color: #f39c12;
+}
+
+.badge {
+    font-size: 0.85rem;
+    padding: 0.4em 0.75em;
+}
+
+body {
+    padding-top: 60px;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+.content-wrapper {
+    margin-left: 250px;
+    transition: margin-left 0.3s ease;
+    padding: 20px;
+}
+
+.container-fluid {
+    position: relative;
+    padding-top: 10px;
+}
+
+.chart-container {
+    height: 300px;
+    margin-bottom: 20px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .content-wrapper {
+        margin-left: 0;
+    }
+
+    .last-update {
+        position: static;
+        margin-bottom: 15px;
+        text-align: center;
+        font-size: 1rem !important;
+    }
+
+    .chart-container {
+        height: 250px;
+    }
+
+    .recent-requests-section {
+        margin-top: 20px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .card h2 {
+        font-size: 1.8rem;
+    }
+
+    .card h5 {
+        font-size: 0.9rem;
+    }
+
+    .chart-container {
+        height: 220px;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table td,
+    .table th {
+        white-space: nowrap;
+    }
+}
+
+@media (max-width: 576px) {
+    .card h2 {
+        font-size: 1.5rem;
+    }
+
+    .card h5 {
+        font-size: 0.8rem;
+    }
+
+    .chart-container {
+        height: 200px;
+    }
+
+    .col-md-3.col-sm-6 {
+        margin-bottom: 15px;
+    }
+
+    .list-group-item {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
+    }
+}
+
+/* Make canvas charts responsive */
+canvas {
+    width: 100% !important;
+    height: auto !important;
+}
+
+.last-update {
+    position: absolute;
+    top: 70px;
+    right: 20px;
+    font-size: 0.85rem;
+    color: #6c757d;
+    background-color: #f8f9fa;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+@media (max-width: 1200px) {
+    .card h5 {
+        font-size: 0.9rem;
+    }
+}
+
+/* สำหรับหน้าจอขนาดใหญ่ (โน๊ตบุ๊ค, MacBook) */
+@media (min-width: 992px) {
+    .content-wrapper {
+        margin-left: 250px;
+        /* ความกว้างของ sidebar */
+        transition: margin-left 0.3s ease;
+    }
+
+    /* เมื่อเปิด sidebar บนหน้าจอใหญ่ ไม่ต้องขยับ content */
+    .sidebar-open .content-wrapper {
+        margin-left: 250px;
+    }
+}
+
+/* สำหรับ iPad ในแนวตั้ง (portrait) */
+@media (max-width: 991.98px) and (min-width: 768px) {
+    .content-wrapper {
+        margin-left: 0;
+    }
+
+    .sidebar-open .content-wrapper {
+        margin-left: 220px;
+        width: calc(100% - 220px);
+    }
+}
+
+/* สำหรับมือถือ */
+@media (max-width: 767.98px) {
+    .content-wrapper {
+        margin-left: 0;
+    }
+
+    .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+
+    .sidebar-open .sidebar {
+        transform: translateX(0);
+    }
+
+    .sidebar-open .content-wrapper {
+        margin-left: 180px;
+        width: calc(100% - 180px);
+    }
+
+    /* เพิ่ม overlay เมื่อ sidebar เปิด */
+    .sidebar-open::after {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 180px;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+    }
+
+    .last-update {
+        position: static;
+        /* ลบการกำหนด position */
+        display: block;
+        /* ทำให้แสดงเป็นบล็อก (ขึ้นบรรทัดใหม่) */
+        width: 100%;
+        /* ความกว้างเต็มบรรทัด */
+        text-align: center;
+        /* จัดข้อความกึ่งกลาง */
+        margin: 10px 0;
+        /* ระยะห่างจากข้างบนและล่าง */
+        padding: 8px;
+        /* เพิ่ม padding */
+        font-size: 1rem !important;
+        /* ขนาดตัวอักษร */
+        background-color: #e9ecef;
+        /* สีพื้นหลัง */
+        border-radius: 0;
+        /* ไม่มีมุมโค้ง */
+    }
+}
+
+/* ป้องกันการ scroll หน้าเว็บเมื่อ sidebar เปิด (เฉพาะ mobile) */
+@media (max-width: 991.98px) {
+    .sidebar-open {
+        overflow: hidden;
+        position: fixed;
+        width: 100%;
+        height: 100%;
+    }
+}
+
+/* --- ขยับเนื้อหาเมื่อ sidebar เปิด --- */
+@media (min-width: 768px) {
+
+    body.sidebar-open .content-container,
+    body.sidebar-open .profile-card-container {
+        margin-left: 220px !important;
+        /* เท่ากับ sidebar จริง */
+        transition: margin-left 0.2s;
+    }
+}
+
+@media (max-width: 767.98px) {
+
+    body.sidebar-open .content-container,
+    body.sidebar-open .profile-card-container {
+        margin-left: 0 !important;
+        /* mobile ไม่ต้องขยับ ให้ sidebar ทับ */
+    }
+}
+
+.sidebar .menu>li>a#dashboardMenu,
+.sidebar .menu>li>a#dashboardMenu i,
+.sidebar .menu>li>a#dashboardMenu span {
+    color: #222 !important;
+}
+
+.sidebar .menu>li.active>a#dashboardMenu,
+.sidebar .menu>li.active>a#dashboardMenu i,
+.sidebar .menu>li.active>a#dashboardMenu span {
+    color: #222 !important;
+}
+
+/* ขยับ content-wrapper เมื่อ sidebar เปิด */
+@media (min-width: 768px) {
+    body.sidebar-open .content-wrapper {
+        margin-left: 220px !important;
+        transition: margin-left 0.2s;
+    }
+}
+
+@media (max-width: 767.98px) {
+    body.sidebar-open .content-wrapper {
+        margin-left: 220 !important;
+        transition: margin-left 0.2s;
+    }
+}
+
+.row.text-center.mb-4 {
+    flex-wrap: nowrap !important;
+    overflow-x: auto;
+    gap: 16px;
+}
+
+.row.text-center.mb-4>[class^="col-"],
+.row.text-center.mb-4>[class*=" col-"] {
+    flex: 1 0 0%;
+    max-width: 20%;
+    min-width: 170px;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+@media (max-width: 1200px) {
+
+    .row.text-center.mb-4>[class^="col-"],
+    .row.text-center.mb-4>[class*=" col-"] {
+        max-width: 22%;
+        min-width: 140px;
+    }
+
+    .card h2 {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 992px) {
+
+    .row.text-center.mb-4>[class^="col-"],
+    .row.text-center.mb-4>[class*=" col-"] {
+        max-width: 25%;
+        min-width: 120px;
+        padding-left: 4px;
+        padding-right: 4px;
+    }
+
+    .card h2 {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .row.text-center.mb-4 {
+        flex-wrap: wrap !important;
+        gap: 8px;
+    }
+
+    .row.text-center.mb-4>[class^="col-"],
+    .row.text-center.mb-4>[class*=" col-"] {
+        max-width: 48%;
+        min-width: 120px;
+    }
+
+    .card h2 {
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .row.text-center.mb-4 {
+        flex-wrap: wrap !important;
+        gap: 6px;
+    }
+
+    .row.text-center.mb-4>[class^="col-"],
+    .row.text-center.mb-4>[class*=" col-"] {
+        max-width: 100%;
+        min-width: 100px;
+    }
+
+    .card h2 {
+        font-size: 1rem;
+    }
+}

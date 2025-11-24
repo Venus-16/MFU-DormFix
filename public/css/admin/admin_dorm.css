@@ -1,0 +1,412 @@
+/* General Layout */
+body {
+    display: flex;
+    flex-direction: column;
+    /* Ensure no margin/padding interference from body itself */
+    margin: 0;
+    padding: 0;
+}
+
+body > .d-flex {
+    flex: 1;
+    min-height: 0;
+}
+
+/* Navbar */
+.navbarad {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f5f5f5;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    position: fixed !important; /* Keep navbar fixed at the top */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px; /* Fixed height for navbar */
+    z-index: 1050; /* Ensure navbar is above other elements */
+}
+
+.navbar-left {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.logo {
+    border-radius: 50%;
+    height: 50px;
+    width: 50px;
+}
+
+.title {
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.title .mfu {
+    color: red;
+    margin-right: 5px;
+}
+
+.title .dormfix {
+    color: #BB9945;
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    font-size: 12px;
+    margin-right: 15px;
+    margin-left: 20px;
+}
+
+.name {
+    font-weight: bold;
+}
+
+.role {
+    color: gray;
+    font-size: 11px;
+}
+
+.profile-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 20px;
+}
+
+/* Sidebar */
+.tabs {
+    position: fixed;
+    top: 60px; /* Aligned with navbar height */
+    left: 0;
+    width: 150px; /* Default full width */
+    height: calc(100vh - 60px); /* Adjust height based on navbar */
+    background-color: #c62828;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0;
+    z-index: 1040; /* Ensure sidebar is below navbar but above main content */
+    overflow-y: auto; /* Enable scrolling for sidebar content if needed */
+    transition: width 0.3s ease; /* Smooth transition for width change */
+}
+
+.tabs p {
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.tab-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 8px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    text-decoration: none;
+    color: inherit;
+}
+
+.tab-item:hover {
+    background-color: #BB9945;
+    color: #3A7062;
+}
+
+.tab-item i {
+    font-size: 1.1rem;
+    width: 20px;
+    text-align: center;
+}
+
+.tab-item span {
+    white-space: nowrap;
+    font-size: 0.85rem;
+    font-weight: 400;
+}
+
+/* Logout Button */
+.logout-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: auto; /* Push to the bottom of the sidebar */
+}
+
+.logout {
+    width: 80%;
+    font-size: 0.8rem;
+    font-weight: bold;
+    background-color: #D9D9D9;
+    text-align: center;
+    padding: 10px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.logout:hover {
+    background-color: #BB9945;
+}
+
+/* Sidebar collapsed style (applies to desktop and smaller screens when toggled) */
+.tabs.collapsed {
+    width: 50px; /* Collapsed width for icon-only mode */
+}
+
+.tabs.collapsed .tab-item {
+    justify-content: center;
+    padding: 10px 0;
+}
+
+.tabs.collapsed .tab-item span {
+    display: none; /* Hide text when collapsed */
+}
+
+.tabs.collapsed .menu {
+    display: none; /* Hide 'MENU' text (assuming this is a p tag inside .tabs) */
+}
+
+.tabs.collapsed .logout-wrapper {
+    display: flex; /* Ensure wrapper is still flex to center icon */
+}
+
+.tabs.collapsed .logout {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #D9D9D9;
+    font-size: 0; /* Hide text */
+}
+
+.tabs.collapsed .logout::before {
+    content: "\f08b"; /* Font Awesome logout icon */
+    font-family: "Font Awesome 5 Free"; /* Ensure Font Awesome is loaded */
+    font-weight: 900; /* Use solid icon weight */
+    font-size: 16px;
+    color: #333;
+}
+
+/* Toggle Button (part of navbar, not sidebar itself) */
+.toggle-btn {
+    font-size: 15px;
+    color: #333;
+    padding: 6px 10px;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+}
+
+/* Active tab styling */
+.tab-item.active {
+    background-color: #ffe0b2;
+    color: #dc3545 !important;
+    font-weight: bold;
+    border-left: 5px solid #ff9800;
+}
+
+.tab-item.active i {
+    color: #dc3545 !important;
+}
+
+/* --- Main Content (This controls the shifting) --- */
+.main-content {
+    margin-left: 150px; /* Default margin for when sidebar is open */
+    width: calc(100% - 150px); /* Default width when sidebar is open */
+    padding: 20px; /* General padding for content */
+    transition: margin-left 0.3s ease, width 0.3s ease; /* Smooth transition for shifting */
+    box-sizing: border-box; /* Include padding/border in width calculation */
+    margin-top: 60px; /* Push content down below the fixed navbar */
+}
+
+/* When sidebar is collapsed (affects all screen sizes now) */
+body.sidebar-collapsed .main-content {
+    margin-left: 50px; /* Shift content left by collapsed sidebar width */
+    width: calc(100% - 50px); /* Expand content width */
+}
+
+/* --- Specific Styles for Manage Dormitories Content --- */
+.dorm-card {
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px; /* Desktop default padding */
+    margin-bottom: 20px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Adjust button spacing within cards for desktop */
+.dorm-card .btn {
+    margin-top: 8px;
+    margin-right: 5px;
+    /* Default Bootstrap button size (btn-primary, btn-warning, btn-danger) */
+    padding: .375rem .75rem; /* Matches Bootstrap's default button padding */
+    font-size: 1rem; /* Matches Bootstrap's default button font size */
+    line-height: 1.5;
+    border-radius: .25rem; /* Matches Bootstrap's default button border-radius */
+}
+
+/* Adjust the Add button in the filter section for desktop */
+.filter-section .btn.btn-success {
+    padding: .375rem .75rem; /* Standard Bootstrap button padding */
+    font-size: 1rem; /* Standard Bootstrap button font size */
+}
+
+/* Ensure h2 is aligned correctly */
+h2 {
+    margin-bottom: 20px; /* Spacing below the heading */
+}
+
+/* Filter/Search Section Styling */
+.filter-section {
+    display: flex; /* Ensure it's a flex container */
+    align-items: center; /* Align items vertically in the center */
+    gap: 15px; /* Spacing between filter elements */
+    margin-top: 20px; /* Space below the heading */
+    margin-bottom: 30px; /* Space above the dorm cards */
+}
+
+.filter-section .input-group {
+    max-width: 300px; /* Limit search bar width on desktop */
+}
+
+/* --- Responsive Adjustments (Applied when screen width is <= 991.98px) --- */
+@media (max-width: 991.98px) {
+    /* Navbar adjustments for smaller screens */
+    .navbarad {
+        height: 60px;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .navbar-left .logo {
+        width: 35px;
+        height: 35px;
+    }
+
+    .navbar-left .title {
+        font-size: 18px;
+        flex-direction: row;
+    }
+
+    .navbar-left .title .mfu,
+    .navbar-left .title .dormfix {
+        font-size: 18px;
+    }
+
+    .navbar-right .user-info {
+        display: none; /* Hide user info to save space */
+    }
+
+    .navbar-right .profile-pic {
+        width: 35px;
+        height: 35px;
+        margin-right: 10px;
+    }
+
+    .fa-bell {
+        font-size: 18px;
+        margin-right: 10px;
+    }
+
+    .toggle-btn {
+        font-size: 20px;
+    }
+
+    /* Adjust main-content padding for smaller screens */
+    .main-content {
+        padding-left: 15px;
+        padding-right: 15px;
+        padding-top: 20px;
+    }
+
+    /* Override Bootstrap's default padding/margin for specific containers */
+    .container.py-5.mt-5 {
+        padding-top: 20px !important;
+        margin-top: 0 !important;
+    }
+
+    /* Center heading on smaller screens */
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    /* Filter section stacking on smaller screens */
+    .filter-section {
+        flex-direction: column; /* Stack filter items vertically */
+        align-items: stretch !important; /* Stretch items to full width */
+        gap: 10px !important; /* Add space between stacked items */
+        margin-bottom: 20px; /* Adjust spacing for stacked filter */
+    }
+
+    .filter-section .btn.btn-success {
+        width: 100%; /* Make add button full width */
+        margin-right: 0 !important;
+    }
+
+    .filter-section .input-group {
+        width: 100%; /* Make search full width */
+        max-width: none; /* Remove max-width on smaller screens */
+    }
+
+    /* Dorm card padding adjustment for tablets/phones */
+    .dorm-card {
+        padding: 15px;
+    }
+
+    /* Dorm card text adjustments */
+    .dorm-card h5 {
+        font-size: 1.25rem;
+    }
+
+    .dorm-card p {
+        font-size: 0.95rem;
+    }
+
+    /* Dorm card buttons for tablets/phones (full width, original size) */
+    .dorm-card .btn {
+        width: 100%; /* Make card buttons full width when stacked */
+        margin-bottom: 8px; /* Space between stacked buttons */
+        margin-right: 0 !important; /* Remove right margin */
+        padding: .375rem .75rem; /* Revert to standard Bootstrap button padding */
+        font-size: 1rem; /* Revert to standard Bootstrap button font size */
+        line-height: 1.5;
+        border-radius: .25rem;
+    }
+}
+
+/* Specific adjustments for very small screens (phones, <= 575.98px) */
+@media (max-width: 575.98px) {
+    .navbar-left .title {
+        font-size: 16px;
+    }
+    .navbar-left .title .mfu,
+    .navbar-left .title .dormfix {
+        font-size: 16px;
+    }
+
+    .fa-bell {
+        font-size: 16px;
+    }
+
+    .toggle-btn {
+        font-size: 18px;
+    }
+
+    .dorm-card {
+        margin-bottom: 15px; /* Slightly reduce space between cards */
+    }
+}

@@ -1,0 +1,376 @@
+/* Basic layout setup */
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        font-family: sans-serif;
+        overflow: hidden; /* Prevent body scroll, content areas will scroll */
+      }
+
+      /* Navbar */
+      .navbar-custom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #f5f5f5;
+        padding: 10px;
+        border-bottom: 1px solid #ccc;
+        position: sticky; /* Sticky to stay at top during scrolling */
+        top: 0;
+        width: 100%;
+        height: 60px;
+        z-index: 1050; /* Higher than sidebar */
+        flex-shrink: 0; /* Prevent navbar from shrinking */
+      }
+
+      .navbar-left {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .logo {
+        border-radius: 50%;
+        height: 50px;
+        width: 50px;
+      }
+
+      .title {
+        font-size: 25px;
+        font-weight: bold;
+      }
+
+      .title .mfu {
+        color: red;
+        margin-right: 5px;
+      }
+
+      .title .dormfix {
+        color: #bb9945;
+      }
+
+      .navbar-right {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+      }
+
+      .user-info {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        font-size: 12px;
+        margin-right: 15px;
+        margin-left: 20px;
+      }
+
+      .name {
+        font-weight: bold;
+      }
+
+      .role {
+        color: gray;
+        font-size: 11px;
+      }
+
+      .profile-pic {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin-right: 20px;
+      }
+
+      /* Main wrapper for sidebar and content */
+      #main-wrapper {
+        display: flex;
+        flex: 1; /* Allows it to fill remaining vertical space */
+        min-height: 0; /* Prevents overflow from flex item */
+        width: 100%; /* Ensure it spans full width */
+      }
+
+      /* Sidebar */
+      #sidebar-container {
+        position: fixed; /* Fixed to stay in place */
+        top: 60px; /* Offset by navbar height */
+        left: 0; /* Default position */
+        width: 150px; /* Default width */
+        height: calc(100vh - 60px); /* Fill remaining viewport height */
+        background-color: #c62828;
+        color: white;
+        flex-shrink: 0; /* Prevent shrinking */
+        transition: width 0.3s ease, left 0.3s ease; /* Smooth transition for collapsing and mobile */
+        overflow-y: auto; /* Scrollable if content is long */
+        z-index: 1040; /* Below navbar */
+      }
+
+      /* Sidebar collapsed style */
+      #sidebar-container.collapsed {
+        width: 50px; /* Adjust this to match your desired collapsed width */
+      }
+
+      #sidebar-container p {
+        font-weight: bold;
+        margin-bottom: 20px;
+        padding-top: 15px;
+      }
+
+      #sidebar-container .tab-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 8px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        text-decoration: none;
+        color: inherit;
+      }
+
+      #sidebar-container .tab-item:hover {
+        background-color: #bb9945;
+        color: #3a7062;
+      }
+
+      #sidebar-container .tab-item i {
+        font-size: 1.1rem;
+        width: 20px;
+        text-align: center;
+      }
+
+      #sidebar-container .tab-item span {
+        white-space: nowrap;
+        font-size: 0.85rem;
+        font-weight: 400;
+        opacity: 1; /* Default visible */
+        transition: opacity 0.3s ease;
+      }
+
+      /* Logout Button */
+      #sidebar-container .logout-wrapper {
+        display: flex;
+        justify-content: center;
+        margin-top: auto;
+      }
+
+      #sidebar-container .logout {
+        width: 80%;
+        font-size: 0.8rem;
+        font-weight: bold;
+        background-color: #d9d9d9;
+        text-align: center;
+        padding: 10px;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        display: flex; /* Make it a flex container for centering icon */
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+      }
+
+      #sidebar-container .logout:hover {
+        background-color: #bb9945;
+      }
+
+      /* Styles for collapsed sidebar */
+      #sidebar-container.collapsed .tab-item {
+        justify-content: center;
+        padding: 10px 0;
+      }
+
+      #sidebar-container.collapsed .tab-item span {
+        opacity: 0; /* Hide text */
+        width: 0; /* Collapse width */
+        overflow: hidden;
+      }
+
+      #sidebar-container.collapsed p.menu {
+        display: none; /* Hide 'MENU' text */
+      }
+
+      #sidebar-container.collapsed .logout {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        padding: 0;
+        font-size: 0; /* Hide text */
+      }
+
+      #sidebar-container.collapsed .logout i {
+        margin: 0;
+        font-size: 16px; /* Restore icon size */
+      }
+
+      /* Optional: Tooltip when collapsed */
+      #sidebar-container.collapsed .tab-item[title] {
+        position: relative;
+      }
+
+      #sidebar-container.collapsed .tab-item[title]:hover::after {
+        content: attr(title);
+        position: absolute;
+        left: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+        background: #333;
+        color: white;
+        padding: 4px 8px;
+        font-size: 12px;
+        border-radius: 4px;
+        white-space: nowrap;
+        margin-left: 10px;
+        z-index: 999;
+      }
+
+      /* Active Tab Styling */
+      #sidebar-container .tab-item.active {
+        background-color: #f8f9fa; /* Light background for active state */
+        color: #dc3545 !important; /* MFU red */
+        font-weight: bold;
+        border-left: 4px solid #dc3545; /* Red left border */
+      }
+
+      #sidebar-container .tab-item.active i {
+        color: #dc3545 !important; /* Change icon color */
+      }
+
+      /* Main content area */
+      .content-area {
+        flex-grow: 1; /* Takes up remaining space */
+        padding: 20px;
+        margin-left: 150px; /* Initial margin for sidebar width */
+        transition: margin-left 0.3s ease; /* Smooth transition for margin */
+        overflow-y: auto; /* Allows content to scroll */
+      }
+
+      /* Adjust content area when sidebar is collapsed */
+      body.sidebar-collapsed .content-area {
+        margin-left: 70px; /* Match collapsed sidebar width */
+      }
+
+      /* Table header sticky */
+      .table thead th {
+        position: sticky;
+        top: 0; /* Stays at the top of its scrollable parent */
+        background-color: #f8f9fa;
+        z-index: 10;
+      }
+
+      /* --- Media Queries --- */
+      @media (max-width: 767px) {
+        .navbar-custom {
+          padding-left: 5px !important;
+          padding-right: 5px !important;
+        }
+
+        .navbar-custom .logo {
+          width: 30px;
+          height: 30px;
+        }
+
+        .navbar-custom .title {
+          font-size: 15px;
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .navbar-custom .title .mfu,
+        .navbar-custom .title .dormfix {
+          font-size: 15px;
+        }
+
+        .navbar-custom .user-info {
+          margin-right: 5px;
+          margin-left: 5px;
+        }
+        .navbar-custom .user-info .name {
+          font-size: 10px;
+        }
+
+        .navbar-custom .user-info .role {
+          font-size: 8px;
+        }
+
+        .navbar-custom .profile-pic {
+          width: 30px !important;
+          height: 28px !important;
+          margin-right: 5px;
+        }
+
+        .navbar-custom .fa-bell {
+          font-size: 12px;
+          margin-right: 5px;
+        }
+
+        .navbar-custom .toggle-btn i {
+          font-size: 15px;
+        }
+
+        /* Sidebar for small screens */
+        #sidebar-container {
+          width: 150px; /* Full width for mobile initially */
+          left: -150px; /* Hidden by default off-screen */
+          transition: left 0.3s ease; /* Smooth slide transition */
+        }
+
+        /* When body has sidebar-closed-mobile, sidebar slides in */
+        body.sidebar-open-mobile #sidebar-container {
+          left: 0;
+        }
+        /* No collapsed state for mobile; it's either open or hidden */
+        #sidebar-container.collapsed {
+          width: 250px; /* Maintain full width even if .collapsed exists */
+        }
+        #sidebar-container.collapsed .tab-item span {
+            opacity: 1;
+            width: auto;
+        }
+        #sidebar-container.collapsed p.menu {
+            display: block;
+        }
+        #sidebar-container.collapsed .logout {
+            width: 80%;
+            font-size: 0.8rem;
+            height: auto;
+            border-radius: 20px;
+            padding: 10px;
+        }
+        #sidebar-container.collapsed .logout i {
+            font-size: 0.8rem;
+        }
+
+        /* Main content area on mobile */
+        .content-area {
+          margin-left: 0; /* No margin on mobile */
+          padding: 10px; /* Adjust padding for mobile */
+        }
+
+        /* Overlay for mobile when sidebar is open */
+        body.sidebar-open-mobile::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5); /* Dim the background */
+            z-index: 1039; /* Below sidebar, above content */
+        }
+
+        /* Custom styles for mobile view */
+        .mobile-btn-group {
+            flex-wrap: wrap; /* Allow buttons to wrap to the next line */
+            gap: 8px; /* Add some space between buttons */
+        }
+
+        .mobile-btn-group > .btn {
+            flex-basis: 100%; /* Make buttons take full width on small screens */
+        }
+
+        /* Spacing for Edit/Delete buttons */
+        .table .btn-warning.btn-sm {
+            margin-bottom: 8px; /* Add vertical space below Edit button on mobile */
+        }
+      }

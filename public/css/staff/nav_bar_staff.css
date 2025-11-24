@@ -1,0 +1,362 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    height: 100%;
+    font-family: sans-serif;
+}
+
+/* Layout */
+body {
+    display: flex;
+    flex-direction: column;
+} 
+
+body>.d-flex {
+    flex: 1;
+    min-height: 0;
+}
+
+/* Navbar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f5f5f5;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    z-index: 1050;
+}
+
+.navbar-left {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.logo {
+    border-radius: 50%;
+    height: 50px;
+    width: 50px;
+
+}
+
+.title {
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.title .mfu {
+    color: red;
+    margin-right: 5px;
+}
+
+.title .dormfix {
+    color: #BB9945;
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    font-size: 12px;
+    margin-right: 15px;
+    margin-left: 20px;
+}
+
+.name {
+    font-weight: bold;
+}
+
+.role {
+    color: gray;
+    font-size: 11px;
+}
+
+.profile-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 20px;
+}
+
+/* Sidebar */
+.tabs {
+    position: fixed;
+    top: 56px;
+    left: 0;
+    width: 150px;
+    height: calc(100vh - 56px);
+    background-color: #c62828;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0;
+    z-index: 1040;
+    overflow-y: auto;
+}
+
+.tabs p {
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.tab-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 8px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    text-decoration: none;
+    color: inherit;
+}
+
+.tab-item:hover {
+    background-color: #BB9945;
+    color: #3A7062;
+}
+
+.tab-item i {
+    font-size: 1.1rem;
+    width: 20px;
+    text-align: center;
+}
+
+.tab-item span {
+    white-space: nowrap;
+    font-size: 0.85rem;
+    font-weight: 400;
+}
+
+/* Logout Button */
+.logout-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: auto;
+}
+
+.logout {
+    width: 80%;
+    font-size: 0.8rem;
+    font-weight: bold;
+    background-color: #D9D9D9;
+    text-align: center;
+    padding: 10px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.logout:hover {
+    background-color: #BB9945;
+}
+
+/* Sidebar collapsed style */
+.tabs.collapsed {
+    width: 50px;
+}
+
+.tabs.collapsed .tab-item {
+    justify-content: center;
+    padding: 10px 0;
+}
+
+.tabs.collapsed .tab-item span {
+    display: none;
+}
+
+.tabs.collapsed .menu {
+    display: none;
+}
+
+.tabs.collapsed .logout-wrapper {
+    display: flex;
+}
+
+/* Toggle Button */
+.toggle-btn {
+    font-size: 15px;
+    color: #333;
+    padding: 6px 10px;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+}
+
+.tabs.collapsed+.toggle-btn {
+    left: 70px;
+}
+
+.toggle-btn:hover {
+    background-color: #f0f0f0;
+}
+
+/* Optional: Tooltip when collapsed */
+.tab-item[title] {
+    position: relative;
+}
+
+.tab-item[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #333;
+    color: white;
+    padding: 4px 8px;
+    font-size: 12px;
+    border-radius: 4px;
+    white-space: nowrap;
+    margin-left: 10px;
+    z-index: 999;
+}
+
+/* ปรับเนื้อหาให้ขยับตาม sidebar */
+.main {
+    margin-left: 150px;
+    transition: margin-left 0.3s ease;
+    padding: 20px;
+}
+
+/* ถ้า sidebar พับ */
+body.sidebar-collapsed .main {
+    margin-left: 50px; /* ให้เท่ากับ .tabs.collapsed width */
+}
+
+
+.tabs.collapsed .logout {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #D9D9D9;
+    font-size: 0;
+    /* ซ่อนข้อความ */
+}
+
+.tabs.collapsed .logout::before {
+    content: "\f08b";
+    /* ไอคอน logout ของ Font Awesome */
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    font-size: 16px;
+    color: #333;
+}
+
+.tab-item.active {
+    background-color: #f8f9fa;
+    /* สีพื้นหลังของเมนูที่ active */
+    color: #dc3545 !important;
+    /* สีตัวอักษรแดง เช่นเดียวกับ MFU */
+    font-weight: bold;
+    border-left: 4px solid #dc3545;
+    /* ขีดแดงด้านซ้าย */
+}
+
+.tab-item.active i {
+    color: #dc3545 !important;
+    /* เปลี่ยนสีไอคอน */
+}
+
+/* In /public/css/staff/nav_bar_staff.css or in a <style> tag */
+.tab-item.active {
+    background-color: #ffe0b2;
+    /* A light orange background */
+    color: #ff9800;
+    /* A darker orange text color */
+    border-left: 5px solid #ff9800;
+    /* A distinctive left border */
+}
+
+/* สำหรับหน้าจอมือถือแนวตั้ง */
+@media (max-width: 767px) and (orientation: portrait) {
+    .navbar {
+        height: 60px;
+        padding-left: 5px !important;
+        padding-right: 5px !important;
+    }
+
+    .logo {
+        width: 30px;
+        height: 30px;
+    }
+
+    .navbar .title {
+        font-size: 15px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .navbar .title .mfu,
+    .navbar .title .dormfix {
+        font-size: 15px;
+    }
+
+    .navbar .user-info .name {
+        font-size: 10px;
+    }
+
+    .navbar .user-info .role {
+        font-size: 8px;
+    }
+
+    .navbar .profile-pic {
+        width: 35px;
+        height: 35px;
+    }
+
+    .fa-bell {
+        font-size: 12px;
+    }
+
+    .toggle-btn i {
+        font-size: 15px;
+    }
+
+    .profile-pic {
+        width: 30px !important;
+        height: 28px !important;
+    }
+
+    /* tabBar */
+    .tabs {
+        width: 120px;
+    }
+
+    .menu {
+        font-size: 13px;
+    }
+
+    .tab-item i {
+        font-size: 0.9rem;
+        text-align: center;
+    }
+        .tab-item span {
+            white-space: nowrap;
+            font-size: 0.7rem;
+            font-weight: 400;   
+        }
+}
+
+
+

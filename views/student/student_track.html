@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="/public/img/MFU.png" type="image/x-icon">
+    <title>Track Request Status</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        html,
+        body {
+            overflow-x: hidden;
+            margin: 0;
+        }
+
+        @keyframes slideUp {
+            0% {
+                transform: translateY(40px);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .animate-slide-up {
+            animation: slideUp 0.3s ease-out;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+
+    <div id="navbar-container"></div>
+
+    <div class="p-6 max-w-5xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6 text-gray-800">Request List</h1>
+        <div id="request-list"></div>
+    </div>
+
+    <div id="loaderContainer" class="flex justify-center items-center py-10">
+        <iframe src="/views/Loading.html" style="width:100%; height:200px; border:none;"></iframe>
+    </div>
+
+
+    <!-- Edit Request Modal -->
+    <form id="editRequestForm" enctype="multipart/form-data">
+        <div id="editModal"
+            class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50 hidden px-4">
+            <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl relative overflow-y-auto max-h-[90vh]">
+
+                <h2 class="text-2xl font-semibold text-center mb-4">Edit Repair Request</h2>
+
+                <!-- Dormitory and Room Number -->
+                <div class="mb-4">
+                    <div class="mb-2">
+                        <label class="font-semibold">Dormitory:</label>
+                        <span class="ml-2 dormitory-name">Loading...</span>
+                    </div>
+                    <div>
+                        <label class="font-semibold">Room Number:</label>
+                        <span class="ml-2 room-number">Loading...</span>
+                    </div>
+                </div>
+
+                <!-- Repair Type -->
+                <div class="mb-4">
+                    <label class="block font-medium mb-1">Repair Type:</label>
+                    <select name="category"
+                        class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                        id="categorySelect">
+                        <option disabled selected value="">Select repair type</option>
+                        <option value="Electrical">Electrical</option>
+                        <option value="Plumbing">Plumbing</option>
+                        <option value="Furniture">Furniture</option>
+                        <option value="Air Conditioning">Air Conditioning</option>
+                        <option value="General">General</option>
+                    </select>
+                </div>
+
+
+                <!-- Durable Articles -->
+                <div class="mb-4">
+                    <label class="block font-medium mb-1">Item:</label>
+                    <input name="article" type="text" value="Bidet hose" placeholder="e.g., Desk, Light"
+                        class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400" />
+                </div>
+
+                <!-- Damage Description -->
+                <div class="mb-4">
+                    <label class="block font-medium mb-1">Damage Description:</label>
+                    <textarea name="description" rows="4" placeholder="Write a description..."
+                        class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 resize-none">The bidet hose is broken.</textarea>
+                </div>
+
+                <!-- Image Upload -->
+                <div class="mb-4">
+                    <label class="block font-medium mb-1">Photos:</label>
+
+                    <label id="editImageLabel"
+                        class="border border-dashed border-gray-400 p-4 flex flex-col items-center justify-center text-gray-500 cursor-pointer hover:bg-gray-50 relative">
+
+                        <!-- Image preview (shows old image OR new one) -->
+                        <img id="editImagePreview" src="" alt="Image Preview"
+                            class="mb-2 w-32 h-32 object-cover rounded shadow hidden" />
+
+                        <!-- Default icon (hidden if image exists) -->
+                        <i id="editImageIcon" class="fas fa-file-image fa-2x mb-2 text-gray-400"></i>
+
+                        <span id="editFileText">Select File</span>
+
+                        <!-- File input -->
+                        <input type="file" name="image" id="editImageInput" accept="image/*"
+                            class="absolute inset-0 opacity-0 cursor-pointer" />
+                    </label>
+
+                    <!-- ✅ File requirements note -->
+                    <p class="mt-2 text-sm text-gray-500">
+                        Allowed: <span class="font-medium">JPG, JPEG, PNG</span> (Max 2MB)
+                    </p>
+                </div>
+
+
+
+
+                <!-- Buttons -->
+                <div class="flex flex-col sm:flex-row justify-end gap-2 mt-6">
+                    <button onclick="closeEditModal()"
+                        class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded w-full sm:w-auto">
+                        Cancel
+                    </button>
+                    <button onclick="saveEditRequest(event)"
+                        class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded w-full sm:w-auto">
+                        Save
+                    </button>
+                </div>
+
+                <!-- Close icon -->
+                <button onclick="closeEditModal()" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Edit Success Modal -->
+    <div id="successModal"
+        class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50 hidden px-4 transition-opacity duration-300">
+        <div
+            class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md text-center animate-slide-up transform transition-transform duration-300">
+            <div class="flex justify-center mb-4">
+                <div class="bg-green-100 p-4 rounded-full">
+                    <i class="fas fa-check-circle text-green-600 text-5xl"></i>
+                </div>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">Request Saved!</h2>
+            <p class="text-gray-600 mb-6 text-sm">Your repair request has been successfully updated.</p>
+            <button onclick="closeSuccessModal()"
+                class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-2 rounded-full font-semibold transition duration-300">
+                OK
+            </button>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div id="errorModal" class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50 hidden px-4">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md text-center">
+            <i class="fas fa-exclamation-circle text-red-500 text-5xl mb-4"></i>
+            <h2 class="text-xl font-semibold mb-2">Error</h2>
+            <p id="errorMessage" class="text-gray-600 mb-4">Something went wrong while saving your request.</p>
+            <button onclick="closeErrorModal()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
+                OK
+            </button>
+        </div>
+    </div>
+
+
+
+    <!-- Cancel Confirmation Modal -->
+    <div id="cancelModal"
+        class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50 hidden px-4">
+        <div
+            class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md sm:max-w-lg relative overflow-y-auto max-h-[90vh]">
+            <div class="flex justify-center mb-4">
+                <i class="fa-solid fa-triangle-exclamation text-red-600 text-5xl"></i>
+            </div>
+            <h2 class="text-xl font-semibold mb-4 text-center">
+                Are You Sure?
+            </h2>
+            <p class="text-center text-gray-700">
+                Do you really want to cancel sending this request?
+                After canceling, you will not be able to undo this action.
+            </p>
+
+            <div class="flex flex-col sm:flex-row justify-end gap-2 mt-6">
+                <button onclick="closeCancelModal()"
+                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded w-full sm:w-auto">
+                    No, Keep It
+                </button>
+                <button onclick="confirmCancelRequest()"
+                    class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded w-full sm:w-auto">
+                    Yes, Cancel
+                </button>
+            </div>
+
+            <!-- Close icon -->
+            <button onclick="closeCancelModal()" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-lg"></i>
+            </button>
+        </div>
+    </div>
+
+
+    <!-- Feedback Modal -->
+    <div id="feedbackModal"
+        class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50 hidden px-4">
+        <div
+            class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md sm:max-w-lg relative overflow-y-auto max-h-[90vh]">
+            <h2 class="text-xl font-semibold mb-4 text-center">Give Feedback</h2>
+            <p class="text-gray-600 text-sm mb-4 text-center">
+                What do you think about the service you received this time?
+            </p>
+
+            <!-- Star Rating -->
+            <div class="flex justify-center mb-4" id="starContainer">
+                <i class="fa-regular fa-star text-2xl text-gray-400 cursor-pointer"></i>
+                <i class="fa-regular fa-star text-2xl text-gray-400 cursor-pointer"></i>
+                <i class="fa-regular fa-star text-2xl text-gray-400 cursor-pointer"></i>
+                <i class="fa-regular fa-star text-2xl text-gray-400 cursor-pointer"></i>
+                <i class="fa-regular fa-star text-2xl text-gray-400 cursor-pointer"></i>
+            </div>
+
+
+
+            <!-- Comment Box -->
+            <div class="mb-4">
+                <label class="block font-medium mb-1">Comment</label>
+                <textarea id="feedbackComment" rows="4"
+                    class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400 resize-none"
+                    placeholder="Write your feedback here..."></textarea>
+                <p id="feedbackError" class="text-red-500 text-sm mt-2 hidden">Please provide both rating and comment.
+                </p>
+            </div>
+
+
+            <!-- Buttons -->
+            <div class="flex flex-col sm:flex-row justify-end gap-2 mt-4">
+                <button onclick="closeModal()"
+                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded w-full sm:w-auto">
+                    Cancel
+                </button>
+                <button onclick="submitFeedback()"
+                    class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded w-full sm:w-auto">
+                    Confirm
+                </button>
+
+            </div>
+
+            <!-- Close icon -->
+            <button onclick="closeModal()" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-lg"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Enhanced Zoomable Image Modal -->
+    <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-lg max-w-5xl w-full mx-4 relative">
+            <!-- Header -->
+            <div class="flex justify-between items-center px-4 py-2 border-b">
+                <h2 class="text-lg font-semibold">Photo Viewer</h2>
+                <button onclick="closeImageModal()" class="text-gray-500 hover:text-red-600 text-xl">
+                    &times;
+                </button>
+            </div>
+
+            <!-- Scrollable Zoom Container -->
+            <div class="overflow-auto p-4" style="max-height: 75vh;">
+                <img id="modalImage" class="rounded shadow transition-transform duration-300 cursor-zoom-in"
+                    style="max-width: 100%; max-height: 100%; transform-origin: center center;" />
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedRequestId = null;
+
+        // Load Navbar HTML
+        fetch("/views/student/student_navbar.html")
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById("navbar-container").innerHTML = html;
+
+                // Wait until navbar is in DOM
+                setTimeout(() => {
+                    // ====== Elements ======
+                    const userBtn = document.getElementById("userBtn");
+                    const userDropdown = document.getElementById("userDropdown");
+                    const notificationBtn = document.getElementById("notificationBtn");
+                    const notificationDropdown = document.getElementById("notificationDropdown");
+                    const logoutModal = document.getElementById("logoutModal");
+                    const cancelLogout = document.getElementById("cancelLogout");
+                    const badge = document.getElementById("notificationCount");
+                    const allTab = document.getElementById("allTab");
+                    const unreadTab = document.getElementById("unreadTab");
+
+                    let currentTab = "all";
+
+                    // ====== Load student name ======
+                    fetch("/student/info")
+                        .then(res => res.json())
+                        .then(info => {
+                            document.getElementById("studentName").innerText = info.name;
+                        })
+                        .catch(() => {
+                            document.getElementById("studentName").innerText = "Student";
+                        });
+
+                    fetchNotifications();
+
+                    // ====== Dropdown Toggle ======
+                    userBtn?.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        notificationDropdown?.classList.add("hidden");
+                        userDropdown?.classList.toggle("hidden");
+                    });
+
+                    notificationBtn?.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        userDropdown?.classList.add("hidden");
+                        notificationDropdown?.classList.toggle("hidden");
+                        fetchNotifications(); // fetch when clicked
+                    });
+
+                    document.addEventListener("click", (event) => {
+                        if (!userDropdown.contains(event.target) && !userBtn.contains(event.target)) {
+                            userDropdown.classList.add("hidden");
+                        }
+                        if (!notificationDropdown.contains(event.target) && !notificationBtn.contains(event.target)) {
+                            notificationDropdown.classList.add("hidden");
+                        }
+                    });
+
+                    // ====== Logout Modal ======
+                    const logoutBtn = document.querySelector("#userDropdown button");
+                    logoutBtn?.addEventListener("click", () => {
+                        logoutModal?.classList.remove("hidden");
+                        logoutModal?.classList.add("flex");
+                    });
+
+                    cancelLogout?.addEventListener("click", () => {
+                        logoutModal?.classList.remove("flex");
+                        logoutModal?.classList.add("hidden");
+                    });
+
+                    // ====== Fetch Notifications ======
+                    // ====== Tabs ======
+                    function setActiveTab(tab) {
+                        if (tab === "all") {
+                            allTab.className = "px-3 py-1 text-sm rounded-full font-medium bg-blue-600 text-white";
+                            unreadTab.className = "px-3 py-1 text-sm rounded-full font-medium bg-gray-200 text-gray-700 hover:bg-gray-300";
+                        } else {
+                            unreadTab.className = "px-3 py-1 text-sm rounded-full font-medium bg-blue-600 text-white";
+                            allTab.className = "px-3 py-1 text-sm rounded-full font-medium bg-gray-200 text-gray-700 hover:bg-gray-300";
+                        }
+                    }
+
+                    allTab?.addEventListener("click", () => {
+                        currentTab = "all";
+                        setActiveTab("all");
+                        fetchNotifications();
+                    });
+
+                    unreadTab?.addEventListener("click", () => {
+                        currentTab = "unread";
+                        setActiveTab("unread");
+                        fetchNotifications();
+                    });
+
+                    const markAllReadBtn = document.getElementById("markAllRead");
+                    markAllReadBtn?.addEventListener("click", async () => {
+                        await fetch("/notifications/read-all", { method: "POST" });
+                        fetchNotifications();
+                    });
+
+                    function formatDateTime(dateString) {
+                        const date = new Date(dateString);
+
+                        // Format: DD/MM/YY HH:mm
+                        const day = String(date.getDate()).padStart(2, '0');
+                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                        const year = String(date.getFullYear()).slice(-2);
+                        const hours = String(date.getHours()).padStart(2, '0');
+                        const minutes = String(date.getMinutes()).padStart(2, '0');
+
+                        return `${day}/${month}/${year} ${hours}:${minutes}`;
+                    }
+
+
+                    // Icon mapping by notification title
+                    const iconMap = {
+                        "Repair Request Confirmed": { icon: "fa-wrench", color: "text-blue-500" },
+                        "Repair Request Updated": { icon: "fa-edit", color: "text-yellow-500" },
+                        "Repair Completed": { icon: "fa-check-circle", color: "text-green-500" }
+                    };
+
+                    async function fetchNotifications() {
+                        try {
+                            const res = await fetch('/student/notifications');
+                            if (!res.ok) throw new Error('Failed to fetch notifications');
+                            const data = await res.json();
+
+                            const list = document.querySelector('#notificationDropdown ul');
+                            const badge = document.getElementById('notificationCount');
+                            list.innerHTML = '';
+
+                            if (!data || data.length === 0) {
+                                list.innerHTML = `<li class="px-4 py-2 text-sm text-gray-500">No new notifications</li>`;
+                                badge.classList.add('hidden');
+                                return;
+                            }
+
+                            // ✅ Apply filter by tab
+                            let filtered = data;
+                            if (currentTab === "unread") {
+                                filtered = data.filter(n => n.is_read === 0);
+                            }
+
+                            if (filtered.length === 0) {
+                                list.innerHTML = `<li class="px-4 py-2 text-sm text-gray-500">No notifications</li>`;
+                                return;
+                            }
+
+                            filtered.forEach(noti => {
+                                // Pick icon from mapping, default to bell
+                                const { icon, color } = iconMap[noti.title] || { icon: "fa-bell", color: "text-gray-500" };
+
+                                const li = document.createElement('li');
+                                li.className =
+                                    "px-4 py-2 text-sm border-b cursor-pointer flex items-start space-x-3 " +
+                                    (noti.is_read === 0
+                                        ? "bg-gray-200 font-semibold text-red-600 hover:bg-gray-300"
+                                        : "bg-white text-gray-600 hover:bg-gray-100");
+
+                                li.innerHTML = `
+                <i class="fas ${icon} ${color} mt-1"></i>
+                <div class="flex-1">
+                    <div class="font-semibold">${noti.title}</div>
+                    <div class="text-xs text-gray-500">${noti.message || ''}</div>
+                    <div class="text-[10px] text-gray-400">${formatDateTime(noti.created_at)}</div>
+                </div>
+            `;
+
+                                li.addEventListener('click', async () => {
+                                    if (noti.link) window.location.href = noti.link;
+
+                                    await fetch('/notifications/read', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ notification_id: noti.notification_id })
+                                    });
+
+                                    fetchNotifications();
+                                });
+
+                                list.appendChild(li);
+                            });
+
+                            // Update badge count
+                            const unreadCount = data.filter(n => n.is_read === 0).length;
+                            if (unreadCount > 0) {
+                                badge.textContent = unreadCount;
+                                badge.classList.remove('hidden');
+                            } else {
+                                badge.classList.add('hidden');
+                            }
+                        } catch (err) {
+                            console.error(err);
+                        }
+                    }
+
+                    // Auto refresh every 30s
+                    setInterval(fetchNotifications, 30000);
+                }, 0);
+            });
+
+        function formatDate(datetimeString) {
+            const date = new Date(datetimeString);
+            return date.toLocaleDateString('en-GB', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+        }
+
+        function formatTime(datetimeString) {
+            const date = new Date(datetimeString);
+            return date.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            });
+        }
+
+        function formatDateTime(datetimeString) {
+            return formatDate(datetimeString) + ' ' + formatTime(datetimeString);
+        }
+
+
+
+
+
+        function renderRequests(requests) {
+            const container = document.getElementById('request-list');
+
+            container.innerHTML = '';
+
+            if (requests.length === 0) {
+                container.innerHTML = `
+        <div class="flex items-center justify-center h-[50vh]">
+            <div class="p-6 text-center text-gray-500 max-w-md">
+                <i class="fas fa-inbox text-4xl mb-3"></i>
+                <p class="text-lg font-semibold">You have not made any repair requests yet.</p>
+                <p class="text-sm">Submit a new request to see it listed here.</p>
+            </div>
+        </div>
+    `;
+                return;
+            }
+
+
+
+            requests.forEach(req => {
+                const statusColor = {
+                    'Pending': 'text-yellow-500',
+                    'Confirmed': 'text-blue-600',
+                    'Completed': 'text-green-600'
+                }[req.status];
+
+                const statusIcon = {
+                    'Pending': 'fa-hourglass-half',
+                    'Confirmed': 'fa-calendar-check',
+                    'Completed': 'fa-check-circle'
+                }[req.status];
+
+                const showFeedback = req.status === 'Completed' && !req.feedback_id;
+
+                const html = `
+    <div class="relative bg-white shadow-md rounded-lg mb-4 p-4 flex flex-col md:flex-row gap-4">
+        <span class="absolute top-4 right-4 font-bold ${statusColor} flex items-center gap-1">
+            <i class="fas ${statusIcon}"></i> ${req.status}
+        </span>
+        <img src="${req.image}" alt="${req.article}" class="w-32 h-32 object-cover rounded cursor-pointer" onclick="openImageModal('${req.image}')">
+        <div class="flex-1">
+            <h2 class="text-xl font-semibold">${req.article}</h2>
+            <p><span class="font-medium">Repair Type:</span> ${req.category_name}</p>
+            <p><span class="font-medium">${req.status === 'Completed' ? 'Detail' : 'Description'}:</span> ${req.description}</p>
+            <p><span class="font-medium">Request Date:</span> ${formatDate(req.request_date)}
+                <span class="ml-4"> ${formatTime(req.request_date)}</span>
+            </p>
+
+            ${req.status === 'Confirmed' ? `
+                <p><i class="fas fa-calendar-alt"></i> <span class="font-medium">Repair Date:</span> ${formatDate(req.repair_date)}
+                    <span class="ml-4"><i class="fa-regular fa-clock"></i> ${formatTime(req.repair_date)}</span>
+                </p>
+                <p><i class="fas fa-user"></i> <span class="font-medium">Technician:</span> ${req.technician_name}</p>
+                <p><i class="fas fa-phone"></i> <span class="font-medium">Phone:</span> ${req.phone_number}</p>
+            ` : ''}
+
+            ${req.status === 'Completed' ? `
+                <p><i class="fas fa-calendar-alt"></i> <span class="font-medium">Repair Date:</span> ${formatDate(req.repair_date)}
+                    <span class="ml-4"><i class="fa-regular fa-clock"></i> ${formatTime(req.repair_date)}</span>
+                </p>
+                <p><i class="fas fa-user"></i> <span class="font-medium">Technician:</span> ${req.technician_name}</p>
+                <p><i class="fas fa-phone"></i> <span class="font-medium">Phone:</span> ${req.phone_number}</p>
+                <p><i class="fas fa-check-circle"></i> <span class="font-medium">Completed Date:</span> ${formatDate(req.complete_date)}
+                    <span class="ml-2"><i class="fas fa-clock"></i> ${formatTime(req.complete_date)}</span>
+                </p>
+                ${showFeedback ? `
+                    <p class="text-sm text-gray-500 mt-2">
+                        You can give feedback within <span class="text-red-600 font-semibold">5 days</span> after completion.
+                    </p>
+                    <div class="flex justify-end mt-2">
+                        <button onclick="openModal(${req.request_id})" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 flex items-center gap-2">
+                            <i class="fas fa-star"></i> Give Feedback
+                        </button>
+                    </div>
+                ` : ''}
+            ` : ''}
+
+            ${req.status === 'Pending' ? `
+                <div class="mt-4 flex justify-center gap-2">
+                    <button onclick="openEditModal(${req.request_id})" class="bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700 flex items-center gap-2">
+                        <i class="fas fa-pen"></i> Edit
+                    </button>
+                    <button onclick="openCancelModal(${req.request_id})" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 flex items-center gap-2">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                </div>
+            ` : ''}
+        </div>
+    </div>
+`;
+
+
+
+                container.insertAdjacentHTML('beforeend', html);
+            });
+        }
+
+        const startTime = Date.now();
+
+        fetch('/student/track-data')
+            .then(res => res.json())
+            .then(data => {
+                const elapsed = Date.now() - startTime;
+                const minDuration = 1000; // Minimum display time in milliseconds (e.g. 1000ms = 1s)
+
+                setTimeout(() => {
+                    document.getElementById('loaderContainer').style.display = 'none';
+                    renderRequests(data);
+                }, Math.max(minDuration - elapsed, 0)); // Ensure it waits at least 1 second
+            })
+            .catch(err => {
+                document.getElementById('loaderContainer').style.display = 'none';
+                console.error('Error loading requests:', err);
+                document.getElementById('request-list').innerHTML = `
+            <div class="text-center text-red-600 font-semibold">
+                Failed to load requests. Please try again later.
+            </div>
+        `;
+            });
+
+
+
+        function openEditModal(id) {
+            selectedRequestId = id;
+
+            // Fetch profile data first
+            fetch('/student/profile-data')
+                .then(res => res.json())
+                .then(profile => {
+                    // Update dormitory and room number in the modal
+                    document.querySelector('#editModal .dormitory-name').innerText = profile.dorm_name;
+                    document.querySelector('#editModal .room-number').innerText = profile.room_number;
+
+                    // Then fetch edit request data
+                    return fetch(`/student/edit-data?request_id=${id}`);
+                })
+                .then(res => res.json())
+                .then(data => {
+                    // Populate editable fields
+                    document.querySelector('#editModal input[type="text"]').value = data.article;
+                    document.querySelector('#editModal textarea').value = data.description;
+
+                    const categorySelect = document.querySelector('#editModal select');
+                    Array.from(categorySelect.options).forEach(opt => {
+                        opt.selected = opt.text === data.category_name;
+                    });
+
+                    // Show image
+                    const preview = document.getElementById('editImagePreview');
+                    const icon = document.getElementById('editImageIcon');
+                    const label = document.getElementById('editFileText');
+
+                    if (data.image) {
+                        preview.src = data.image;
+                        preview.classList.remove('hidden');
+                        icon.classList.add('hidden');
+                        label.innerText = 'Change File';
+                    } else {
+                        preview.classList.add('hidden');
+                        icon.classList.remove('hidden');
+                        label.innerText = 'Select File';
+                    }
+
+                    // Show the modal
+                    document.getElementById('editModal').classList.remove('hidden');
+                })
+                .catch(err => {
+                    console.error('Failed to load edit modal data:', err);
+                });
+        }
+
+
+
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.add('hidden');
+        }
+
+        function saveEditRequest(event) {
+            event.preventDefault();
+
+            const articleInput = document.querySelector('#editModal input[name="article"]');
+            const descriptionTextarea = document.querySelector('#editModal textarea[name="description"]');
+            const categorySelect = document.querySelector('#editModal select[name="category"]');
+
+            const article = articleInput.value.trim();
+            const description = descriptionTextarea.value.trim();
+            const category = categorySelect.value;
+
+            // Frontend validation
+            if (!article || !description || !category) {
+                showErrorModal("Please fill out all required fields before saving.");
+                return;
+            }
+
+            const button = event.target;
+            button.disabled = true;
+            button.innerText = "Saving...";
+
+            const form = document.getElementById('editRequestForm');
+            const formData = new FormData(form);
+            formData.append('request_id', selectedRequestId);
+
+            fetch('/student/edit', {
+                method: 'POST',
+                body: formData,
+            })
+                .then(res => {
+                    if (!res.ok) return res.text().then(text => { throw new Error(text); });
+                    return res.text();
+                })
+                .then(() => {
+                    closeEditModal();
+                    showSuccessModal();
+                })
+                .catch(err => {
+                    button.disabled = false;
+                    button.innerText = "Save";
+                    showErrorModal(err.message);
+                });
+        }
+
+
+        function showSuccessModal() {
+            document.getElementById("successModal").classList.remove("hidden");
+
+
+            setTimeout(() => {
+                closeSuccessModal();
+                location.reload(); // or fetch updated data instead
+            }, 1500);
+        }
+
+        function closeSuccessModal() {
+            document.getElementById("successModal").classList.add("hidden");
+        }
+
+        function showErrorModal(message) {
+            const modal = document.getElementById("errorModal");
+            document.getElementById("errorMessage").innerText = message || "Something went wrong.";
+            modal.classList.remove("hidden");
+        }
+
+        function closeErrorModal() {
+            document.getElementById("errorModal").classList.add("hidden");
+        }
+
+
+        function openCancelModal(id) {
+            selectedRequestId = id;
+            document.getElementById('cancelModal').classList.remove('hidden');
+        }
+
+        function closeCancelModal() {
+            document.getElementById('cancelModal').classList.add('hidden');
+        }
+
+        function confirmCancelRequest() {
+            fetch('/student/cancel', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ request_id: selectedRequestId })
+            })
+                .then(res => res.text())
+                .then(() => {
+                    closeCancelModal();
+                    location.reload();
+                })
+                .catch(err => alert(err.message));
+        }
+
+        let selectedRating = 0;
+
+        document.querySelectorAll("#starContainer i").forEach((star, index) => {
+            star.addEventListener("click", () => {
+                selectedRating = index + 1;
+                updateStarDisplay();
+            });
+        });
+
+        function updateStarDisplay() {
+            const stars = document.querySelectorAll("#starContainer i");
+            stars.forEach((star, index) => {
+                if (index < selectedRating) {
+                    star.classList.remove("fa-regular");
+                    star.classList.add("fa-solid", "text-yellow-500");
+                } else {
+                    star.classList.remove("fa-solid", "text-yellow-500");
+                    star.classList.add("fa-regular");
+                }
+            });
+        }
+
+
+        function openModal(id) {
+            selectedRequestId = id;
+            document.getElementById('feedbackModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('feedbackModal').classList.add('hidden');
+        }
+
+        function submitFeedback() {
+            const comment = document.getElementById('feedbackComment').value.trim();
+            const errorText = document.getElementById('feedbackError');
+
+            if (selectedRating === 0 || comment === "") {
+                errorText.classList.remove('hidden');
+                return;
+            }
+
+            errorText.classList.add('hidden'); // hide error if validation passed
+
+            fetch('/student/feedback', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ request_id: selectedRequestId, rating: selectedRating, comment })
+            })
+                .then(res => res.text())
+                .then(() => {
+                    closeModal();
+                    location.reload();
+                })
+                .catch(err => {
+                    errorText.textContent = "Something went wrong. Please try again.";
+                    errorText.classList.remove('hidden');
+                });
+        }
+
+
+
+        function openImageModal(src) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            modal.classList.remove('hidden');
+            modalImg.src = src;
+        }
+
+        function closeImageModal() {
+            document.getElementById('imageModal').classList.add('hidden');
+        }
+
+        document.getElementById('editImageInput').addEventListener('change', function () {
+            const file = this.files[0];
+            const preview = document.getElementById('editImagePreview');
+            const icon = document.getElementById('editImageIcon');
+            const label = document.getElementById('editFileText');
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    preview.classList.remove('hidden');
+                    icon.classList.add('hidden');
+                    label.innerText = 'Change File';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+</body>
+
+</html>

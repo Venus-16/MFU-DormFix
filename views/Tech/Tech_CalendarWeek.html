@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Repair Calendar</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="/public/css/Head/caledndarWeek.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
+    <link rel="shortcut icon" href="/public/img/MFU.png" type="image/x-icon">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        #calendar-container {
+            position: relative;
+        }
+
+        #calendar-loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #fffbe9e0;
+            z-index: 50;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .center-loader-container {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .notification-bell {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .badge-noti {
+            position: absolute;
+            top: -7px;
+            right: -6px;
+            min-width: 18px;
+            height: 18px;
+            background: #e63946;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+            padding: 0 3px;
+            z-index: 10;
+            border: 1.5px solid #fffbe5;
+            transition: background 0.18s;
+            line-height: 1;
+        }
+
+        #bellBtn .bi-bell {
+            font-size: 1.28rem !important;
+            color: #1877f2 !important;
+        }
+
+        #notificationPanel {
+            position: absolute;
+            top: 53px;
+            right: 0;
+            width: 400px;
+            max-height: 470px;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+            border: 2px solid #f8d24f;
+            overflow: hidden;
+            z-index: 3000;
+            display: none;
+            animation: slideDown .20s;
+        }
+
+        #allNotificationsModal.modal {
+            z-index: 4001 !important;
+        }
+
+        .modal-backdrop {
+            z-index: 4000 !important;
+        }
+
+        #notificationPanel {
+            z-index: 3000 !important;
+        }
+
+        @keyframes slideDown {
+            0% {
+                opacity: 0;
+                transform: translateY(-15px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .panel-header {
+            background: #fff;
+            padding: 18px 18px 0 18px;
+            font-weight: bold;
+            color: #222;
+            font-size: 1.1rem;
+            border-bottom: 1px solid #fddf8e;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-tabs {
+            background: #fff;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #fddf8e;
+        }
+
+        .noti-tab-btn {
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 16px;
+            padding: 6px 18px;
+            border: none;
+            outline: none;
+            margin-right: 6px;
+            transition: background 0.2s, color 0.2s;
+            cursor: pointer;
+            background: none;
+            color: #19386b;
+        }
+
+        .noti-tab-btn.active {
+            background: #19386b !important;
+            color: #fff !important;
+        }
+
+        .noti-tab-btn:not(.active) {
+            background: none !important;
+            color: #19386b !important;
+        }
+
+        .noti-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            max-height: 320px;
+            overflow-y: auto;
+        }
+
+        .noti-list li {
+            padding: 18px 22px;
+            border-bottom: 1px solid #f2f2f2;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            cursor: pointer;
+            background: #fffbe5;
+            transition: background 0.2s;
+            position: relative;
+        }
+
+        .noti-list li:last-child {
+            border-bottom: none;
+        }
+
+        .noti-list li:hover {
+            background: #f8f6e3;
+        }
+
+        .noti-icon {
+            font-size: 1.35rem;
+            margin-top: 2px;
+            color: #e63946;
+            min-width: 28px;
+            text-align: center;
+        }
+
+        .noti-content {
+            flex: 1;
+        }
+
+        .noti-title {
+            font-weight: 600;
+            margin-bottom: 2px;
+            font-size: 1.03rem;
+            color: #222;
+        }
+
+        .noti-time {
+            font-size: 0.85rem;
+            color: #999;
+        }
+
+        .noti-empty {
+            padding: 36px 0;
+            text-align: center;
+            color: #bdbdbd;
+            font-size: 1rem;
+        }
+
+        .noti-list .dot-unread {
+            width: 11px;
+            height: 11px;
+            background: #1877f2;
+            border-radius: 50%;
+            margin-left: 8px;
+            display: inline-block;
+            vertical-align: middle;
+            position: absolute;
+            right: 16px;
+            top: 28px;
+        }
+
+        .noti-unread {
+            background: #fffbe5 !important;
+            border-left: 4px solid #f8d24f;
+        }
+
+        .noti-unread .noti-icon {
+            color: #e63946 !important;
+        }
+
+        .noti-read {
+            background: #fff !important;
+            opacity: 1 !important;
+            border-left: none !important;
+        }
+
+        .noti-read .noti-icon {
+            color: #bdbdbd !important;
+        }
+
+        .panel-footer {
+            padding: 14px 0 12px 0;
+            text-align: center;
+            border-top: 1px solid #fff9e7;
+            border-radius: 0 0 20px 20px;
+        }
+
+        .panel-footer a {
+            color: #e63946;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1.03rem;
+            transition: color 0.2s;
+        }
+
+        .panel-footer a:hover {
+            color: #d10012;
+        }
+
+        .modal {
+            z-index: 1055 !important;
+            pointer-events: auto !important;
+        }
+
+        .modal-backdrop {
+            z-index: 1050 !important;
+            pointer-events: auto !important;
+        }
+
+        #calendar-loading-overlay {
+            z-index: 50 !important;
+            display: none !important;
+            /* ต้องแน่ใจว่าถูกซ่อนตอนเปิด modal */
+        }
+    </style>
+</head>
+
+<body class="d-flex">
+    <!-- Sidebar Left -->
+    <div class="sidebar" id="sidebar" style="width: 330px;">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <button class="btn btn-outline-secondary btn-sm icon-toggle"
+                    style="background-color: white; color: #6c757d; border-color: #6c757d;" onclick="history.back()">
+                    <i class="bi bi-arrow-left fs-5"></i>
+                </button>
+
+                <input id="monthYearPicker" class="form-control d-inline-block w-auto" style="width: 200px;"
+                    placeholder="Select Month/Year" />
+            </div>
+        </div>
+
+        <!-- Mini Calendar -->
+        <div class="mb-3">
+            <table class="table text-white table-borderless small">
+                <thead>
+                    <tr>
+                        <th>Sun</th>
+                        <th>Mon</th>
+                        <th>Tue</th>
+                        <th>Wed</th>
+                        <th>Thu</th>
+                        <th>Fri</th>
+                        <th>Sat</th>
+                    </tr>
+                </thead>
+                <tbody id="miniCalendarBody">
+                    <!-- Filled by JS -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Today Events -->
+        <div class="mb-3">
+            <h6 class="text-uppercase small" id="todayTitle">Today</h6>
+            <div class="small" id="todayEvents">
+                <!-- Events inserted by JS -->
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <!-- Header -->
+        <nav class="navbar navbar-custom navbar-expand-lg">
+            <div class="container-fluid">
+                <!-- Hamburger for mobile -->
+                <button class="btn btn-outline-secondary d-lg-none me-2" id="toggleSidebar" aria-label="Toggle sidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <a class="navbar-brand fw-bold" href="/tech/repairlist">Repair Schedule</a>
+
+                <div class="ms-auto d-flex align-items-center">
+                    <!-- Notification Bell -->
+                    <div class="notification-bell me-2" style="display:flex;align-items:center;">
+                        <button id="bellBtn" class="btn btn-link position-relative"
+                            style="text-decoration: none; padding: 0; min-width:40px; min-height:40px; display:flex;align-items:center;justify-content:center;">
+                            <i class="bi bi-bell" style="font-size: 1.7rem; color: #0d6efd; vertical-align:middle;"></i>
+                            <span class="badge-noti" id="notiCount" style="display:none;top:4px;right:2px;">0</span>
+                        </button>
+                        <div id="notificationPanel" style="display:none;">
+                            <div class="panel-header d-flex align-items-center justify-content-between">
+                                <span style="font-weight:bold;font-size:1.15rem;color:#222;">Notifications</span>
+                                <button class="btn btn-link btn-sm" id="markAllReadBtn" type="button"
+                                    style="text-decoration:none;">
+                                    <i class="bi bi-check2-all me-1"></i> Mark all as read
+                                </button>
+                            </div>
+                            <div class="panel-tabs d-flex align-items-center gap-3 px-3 pb-2 pt-2"
+                                style="background:#fff;">
+                                <button class="noti-tab-btn active" id="tabAll">All</button>
+                                <button class="noti-tab-btn" id="tabUnread">Unread</button>
+                            </div>
+                            <ul class="noti-list" id="notiList" style="max-height:320px;overflow-y:auto;"></ul>
+                            <div class="panel-footer">
+                                <a href="#" id="seeAllNoti" style="color:#e63946;font-weight:500;">See all
+                                    notifications</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Profile Dropdown -->
+                    <div class="dropdown">
+                        <button class="btn btn-link dropdown-toggle d-flex align-items-center" type="button"
+                            data-bs-toggle="dropdown" aria-expanded="false" style="text-decoration: none;">
+                            <img id="profile-img" src="/public/img/mechanic.png" alt="profile"
+                                class="profile-img-circle" />
+                            <div class="text-end d-none d-lg-block">
+                                <div class="name" id="userName" style="font-weight: 600;">Loading...</div>
+                                <div class="role" id="userRole" style="font-size: 0.8rem;">Loading...</div>
+                            </div>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" id="profileLink" href="#">Profile</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" id="logoutLink" href="#">Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Tab Bar -->
+        <div class="tabbar d-flex justify-content-between align-items-center p-3">
+            <div>
+                <input id="monthYearPicker2" class="form-control d-inline-block w-auto" style="width: 200px;"
+                    placeholder="Select Month/Year" />
+
+            </div>
+
+            <!-- View Only -->
+            <div class="btn-group view-buttons">
+                <button class="btn btn-outline-secondary" onclick="switchView('day')">Day</button>
+                <button class="btn btn-outline-secondary active" onclick="switchView('week')">Week</button>
+                <button class="btn btn-outline-secondary" onclick="switchView('month')">Month</button>
+            </div>
+        </div>
+
+        <div class="container-fluid mt-3" id="calendar-container">
+            <!-- Loading overlay (content will be loaded dynamically) -->
+            <div id="calendar-loading-overlay"></div>
+            <!-- Week Navigation -->
+            <div class="d-flex justify-content-between align-items-center mb-3" id="weekNav">
+                <button class="btn btn-outline-primary btn-sm" onclick="changeWeek(-1)">
+                    <i class="fas fa-chevron-left"></i> Previous
+                </button>
+                <div id="weekRange" class="fw-bold text-center fs-5"></div>
+                <button class="btn btn-outline-primary btn-sm" onclick="changeWeek(1)">
+                    Next <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+
+            <!-- Week View -->
+            <div class="week-view" id="calendarWeek">
+                <div class="table-responsive">
+                    <table class="table table-bordered text-center align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="time-column">Time</th>
+                                <th class="day-column" id="weekSun">Sun<br><span class="date-badge"></span></th>
+                                <th class="day-column" id="weekMon">Mon<br><span class="date-badge"></span></th>
+                                <th class="day-column" id="weekTue">Tue<br><span class="date-badge"></span></th>
+                                <th class="day-column" id="weekWed">Wed<br><span class="date-badge"></span></th>
+                                <th class="day-column" id="weekThu">Thu<br><span class="date-badge"></span></th>
+                                <th class="day-column" id="weekFri">Fri<br><span class="date-badge"></span></th>
+                                <th class="day-column" id="weekSat">Sat<br><span class="date-badge"></span></th>
+                            </tr>
+                        </thead>
+                        <tbody id="weekCalendarBody">
+                            <!-- Filled dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Mobile Week View (alternative layout) -->
+            <div class="mobile-week-view" id="mobileCalendarWeek" style="display:none">
+                <!-- Filled dynamically for mobile -->
+            </div>
+
+            <!-- Day View -->
+            <div class="day-view" id="calendarDay" style="display: none;">
+                <div class="day-view-container">
+                    <!-- Day view content -->
+                </div>
+            </div>
+
+            <!-- Event Details Popup -->
+            <div class="modal fade" id="eventDetailsModal" tabindex="-1" aria-labelledby="eventDetailsModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content shadow rounded-4 border-0">
+                        <div class="modal-header bg-warning text-dark rounded-top-4">
+                            <h5 class="modal-title" id="eventDetailsModalLabel">
+                                <i class="bi bi-tools me-2"></i>Repair Details
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body bg-light-subtle">
+                            <!-- Basic Info -->
+                            <div class="card mb-3 border-0 shadow-sm">
+                                <div class="card-body">
+                                    <h6 class="text-uppercase fw-bold text-warning mb-3">
+                                        <i class="bi bi-info-circle me-2"></i>Basic Information
+                                    </h6>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-2">
+                                            <p><strong>Date:</strong> <span id="eventDate"></span></p>
+                                            <p><strong>Time:</strong> <span id="eventTime"></span></p>
+                                        </div>
+                                        <div class="col-md-6 mb-2">
+                                            <p><strong>Status:</strong> <span id="eventStatus"
+                                                    class="badge bg-info"></span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Location Info -->
+                            <div class="card mb-3 border-0 shadow-sm">
+                                <div class="card-body">
+                                    <h6 class="text-uppercase fw-bold text-warning mb-3">
+                                        <i class="bi bi-geo-alt me-2"></i>Location
+                                    </h6>
+                                    <p><strong>Dormitory:</strong> <span id="eventDormitory"></span></p>
+                                    <p><strong>Room:</strong> <span id="eventRoom"></span></p>
+                                </div>
+                            </div>
+
+                            <!-- Repair Info -->
+                            <div class="card mb-3 border-0 shadow-sm">
+                                <div class="card-body">
+                                    <h6 class="text-uppercase fw-bold text-warning mb-3">
+                                        <i class="bi bi-tools me-2"></i>Repair Information
+                                    </h6>
+                                    <p><strong>Item:</strong> <span id="eventItem"></span></p>
+                                    <p><strong>Damage Description:</strong> <span id="eventDescription"></span></p>
+                                </div>
+                            </div>
+
+                            <!-- Technician Info -->
+                            <div class="card mb-3 border-0 shadow-sm">
+                                <div class="card-body">
+                                    <h6 class="text-uppercase fw-bold text-warning mb-3">
+                                        <i class="bi bi-person-gear me-2"></i>Assignee
+                                    </h6>
+                                    <p><strong>Head Technician:</strong> <span id="eventTechnician"></span></p>
+                                    <p><strong>Phone Number:</strong> <span id="eventContact"></span></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer bg-white rounded-bottom-4">
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
+                                <i class="bi bi-x-circle me-1"></i>Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Logout Confirmation Modal -->
+        <div class="modal fade" id="logoutConfirmModal" tabindex="-1" aria-labelledby="logoutConfirmLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content rounded-3">
+                    <div class="modal-header border-0">
+                        <h5 class="modal-title" id="logoutConfirmLabel">
+                            <i class="bi bi-box-arrow-right me-2 text-danger"></i>Confirm Logout
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <p style="font-size:1.15rem;">Are you sure you want to log out?</p>
+                    </div>
+                    <div class="modal-footer border-0 justify-content-center">
+                        <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-danger px-4" id="confirmLogoutBtn">Log Out</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Modal: All Notifications -->
+        <div class="modal fade" id="allNotificationsModal" tabindex="-1" aria-labelledby="allNotificationsLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable modal-lg">
+                <div class="modal-content rounded-3">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="allNotificationsLabel">
+                            <i class="bi bi-bell me-2 text-warning"></i>All Notifications
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" style="max-height: 500px; overflow-y:auto;">
+                        <ul class="list-group" id="allNotiList"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="/public/js/Tech/Tech_CalendarWeek.js"></script>
+        <script src="/public/js/Tech/Tech.navbar-notification.js"></script>
+        <script>
+            async function showLoading() {
+                const overlay = document.getElementById('calendar-loading-overlay');
+                if (!overlay) return;
+                overlay.style.display = 'flex';
+                // โหลดเนื้อหา Loading.html จากเซิร์ฟเวอร์
+                try {
+                    const res = await fetch('/loading');
+                    const html = await res.text();
+                    overlay.innerHTML = html;
+                } catch (e) {
+                    overlay.innerHTML = '<div style="color:#c00; font-size:1.5rem">Loading...</div>';
+                }
+            }
+            function hideLoading() {
+                const overlay = document.getElementById('calendar-loading-overlay');
+                if (!overlay) return;
+                overlay.style.opacity = '0';
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                    overlay.innerHTML = '';
+                    overlay.style.opacity = '1';
+                }, 400);
+            }
+            document.addEventListener('DOMContentLoaded', function () {
+                showLoading();
+                // ตัวอย่าง: ซ่อน loading หลังโหลดข้อมูลเสร็จ (simulate 1.5 วินาที)
+                setTimeout(hideLoading, 1500);
+            });
+            document.getElementById('markAllReadBtn').onclick = function () {
+                document.querySelectorAll('.noti-list .noti-unread').forEach(function (item) {
+                    item.classList.remove('noti-unread');
+                    item.classList.add('noti-read');
+                    // ถ้ามี dot-unread ให้ซ่อนด้วย
+                    const dot = item.querySelector('.dot-unread');
+                    if (dot) dot.style.display = 'none';
+                });
+                document.getElementById('notiCount').style.display = 'none';
+            };
+
+            // สร้าง badge อัตโนมัติแบบ overlay
+            function updateBadgeCount() {
+                // นับ noti-unread
+                const unreadCount = notiData.filter(n => !n.read).length;
+                let badge = document.getElementById('notiCount');
+                if (!badge) {
+                    const bellBtn = document.getElementById('bellBtn');
+                    badge = document.createElement('span');
+                    badge.className = 'badge-noti';
+                    badge.id = 'notiCount';
+                    bellBtn.appendChild(badge);
+                }
+                // แสดง badge เฉพาะถ้ามี unread
+                if (unreadCount > 0) {
+                    badge.style.display = 'flex';
+                    badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+            // เรียกทุกครั้งหลัง render noti-list หรือหลัง mark all read
+            document.addEventListener('DOMContentLoaded', () => {
+                fetchNotifications().then(() => {
+                    setupNotificationBell();
+                    updateBadgeCount();
+                });
+            });
+            function setupMarkAllRead() {
+                const markAllReadBtn = document.getElementById('markAllReadBtn');
+                if (markAllReadBtn) {
+                    markAllReadBtn.onclick = function () {
+                        fetch('/tech/notifications/read-all', {
+                            method: 'POST',
+                            credentials: 'include'
+                        }).then(() => {
+                            notiData.forEach(n => n.read = true);
+                            renderNotifications();
+                        });
+                    };
+                }
+            }
+        </script>
+    </div>
+</body>
+
+</html>

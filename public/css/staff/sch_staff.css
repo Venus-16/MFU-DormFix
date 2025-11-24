@@ -1,0 +1,193 @@
+body {
+    background-image: url('/public/img/mfu.jpg');
+    flex-direction: column;
+    height: 100%;
+}
+
+
+#repair {
+    font-size: 40px;
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+main.flex-fill {
+    margin-top: 60px;
+    margin-left: 150px;
+    flex-grow: 1;
+    padding: 2rem;
+    overflow-y: auto;
+    height: 100%;
+    transition: margin-left 0.3s ease;
+}
+
+body.sidebar-collapsed main.flex-fill {
+    margin-left: 60px;
+}
+
+/* ปฏิทิน */
+#calendarGrid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    padding: 10px;
+    background-color: rgba(255 255 255 / 0.8);
+    border-radius: 8px;
+    user-select: none;
+}
+
+.day-label {
+    font-weight: bold;
+    text-align: center;
+    padding: 8px 0;
+    background-color: #0d6efd;
+    color: white;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    height: 50px;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.day-cell {
+    min-height: 80px;
+    border: 1px solid #ccc;
+    padding: 6px 8px;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.day-cell .date-number {
+    font-weight: bold;
+    margin-bottom: 4px;
+    font-size: 1.1rem;
+}
+
+.event {
+    margin-top: 4px;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-grow: 0;
+    color: #000;
+    cursor: pointer;
+    /* Added cursor pointer to indicate clickability */
+}
+
+/* สีแยกตามประเภทซ่อม */
+.event.general {
+    background-color: #FF99CC;
+    border-left: 4px solid #FF3366;
+}
+
+.event.furniture {
+    background-color: #FFD580;
+    border-left: 4px solid #FFAA33;
+}
+
+.event.electrical {
+    background-color: #B3E5FC;
+    border-left: 4px solid #0288D1;
+}
+
+.event.plumbing {
+    background-color: #C8E6C9;
+    border-left: 4px solid #388E3C;
+}
+
+.event.air {
+    background-color: #D1ECF1;
+    border-left: 4px solid #0C5460;
+}
+
+.empty-day {
+    border: none;
+    background: transparent;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    #loading-overlay {
+        top: 0;
+        left: 70px !important;
+        width: 100vw;
+        height: 100vh;
+    }
+
+    main.flex-fill {
+        margin-top: 60px;
+        margin-left: 100px;
+    }
+
+    #repair {
+        font-size: 25px;
+        margin-right: 20px;
+    }
+
+    /* คงไว้ 7 วัน แต่ทำให้ดูพอดีกับมือถือ */
+    #calendarGrid {
+        grid-template-columns: repeat(7, 1fr);
+        gap: 4px;
+        padding: 6px;
+    }
+
+    .day-label {
+        font-size: 0.65rem;
+        padding: 4px 0;
+        height: 40px;
+    }
+
+    .day-cell {
+        min-height: 60px;
+        padding: 4px;
+        font-size: 0.75rem;
+        border-radius: 4px;
+    }
+
+    .day-cell .date-number {
+        font-size: 0.8rem;
+        margin-bottom: 2px;
+    }
+
+    .event {
+        margin-top: 2px;
+        height: 6px;
+        border-radius: 3px;
+        padding: 0;
+        font-size: 0;
+        overflow: hidden;
+    }
+
+    /* กำหนดสี event เป็นแถบเหมือน iPhone */
+    .event.general {
+        background-color: #FF3366;
+    }
+
+    .event.furniture {
+        background-color: #FFAA33;
+    }
+
+    .event.electrical {
+        background-color: #0288D1;
+    }
+
+    .event.plumbing {
+        background-color: #388E3C;
+    }
+
+    .event.air {
+        background-color: #0C5460;
+    }
+
+    .event:hover {
+        transform: scale(1.05);
+        transition: transform 0.2s ease-in-out;
+    }
+}

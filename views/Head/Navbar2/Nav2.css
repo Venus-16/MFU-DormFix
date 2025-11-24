@@ -1,0 +1,294 @@
+/* Navbar styling */
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #FDDF8E;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 60px;
+    z-index: 1000;
+    padding: 0 15px;
+    flex-wrap: nowrap !important;
+    /* Prevent wrap for all screens */
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    margin-right: 0;
+}
+
+.navbar-brand h2 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+/* Sidebar container */
+.sidebar {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    width: 180px;
+    height: calc(100% - 60px);
+    background-color: #e63946;
+    padding-top: 20px;
+    z-index: 100;
+    transition: all 0.3s;
+    overflow-y: auto;
+}
+
+/* Menu style */
+.sidebar .menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Each item */
+.sidebar .menu li {
+    padding: 15px 10px;
+    transition: all 0.3s;
+}
+
+.sidebar .menu li a,
+.sidebar .menu li a i,
+.sidebar .menu li a span {
+    color: white !important;
+}
+
+/* ตั้งค่าเมื่อ Active (กดเลือกแล้ว) */
+.sidebar .menu li.active>a,
+.sidebar .menu li.active>a i,
+.sidebar .menu li.active>a span,
+.sidebar .menu .collapse li.active a,
+.sidebar .menu .collapse li.active a i {
+    color: black !important;
+}
+
+.sidebar .menu>li.dropdown.active>a,
+.sidebar .menu>li.dropdown.active>a i,
+.sidebar .menu>li.dropdown.active>a span,
+.sidebar .menu>li.dropdown.active>a .bi-chevron-down {
+    color: black !important;
+}
+
+/* ปิดการเปลี่ยนสีเมื่อ Hover */
+.sidebar .menu li:hover>a,
+.sidebar .menu li:hover>a i,
+.sidebar .menu li:hover>a span {
+    color: rgb(0, 0, 0) !important;
+}
+
+.sidebar .menu>li.dropdown>a[aria-expanded="true"] .bi-chevron-down {
+    color: black !important;
+    transform: rotate(180deg);
+}
+
+/* เพิ่ม transition สำหรับลูกศร */
+.sidebar .menu>li.dropdown>a .bi-chevron-down {
+    transition: transform 0.3s, color 0.3s;
+}
+
+/* เอาเส้น underline ออกจากลิงก์เมนูทั้งหมด */
+.sidebar .menu a {
+    text-decoration: none !important;
+}
+
+/* เอาเส้น underline เมื่อ hover */
+.sidebar .menu a:hover {
+    text-decoration: none !important;
+}
+
+/* เอาเส้น underline เมื่อ active */
+.sidebar .menu li.active a {
+    text-decoration: none !important;
+}
+
+/* เอาเส้น underline จาก dropdown items */
+.sidebar .menu .collapse a {
+    text-decoration: none !important;
+}
+
+/* ตั้งค่าขนาดตัวอักษรเมนูหลัก */
+.sidebar .menu>li>a,
+.sidebar .menu>li>a span,
+.sidebar .menu>li>a i {
+    font-size: 1.20rem !important;
+}
+
+/* ตั้งค่าขนาดตัวอักษรเมนูย่อย */
+.sidebar .menu .collapse li a,
+.sidebar .menu .collapse li a span,
+.sidebar .menu .collapse li a i {
+    font-size: 1.20rem !important;
+}
+
+/* ปรับลูกศร dropdown */
+.sidebar .menu>li.dropdown>a .bi-chevron-down {
+    font-size: 1rem !important;
+}
+
+/* Main content area */
+.main-content {
+    margin-left: 180px;
+    margin-top: 60px;
+    padding: 20px;
+    transition: all 0.3s;
+}
+
+/* Profile dropdown */
+.profile-dropdown {
+    display: flex !important;
+    align-items: center !important;
+    flex-direction: row !important;
+    gap: 8px;
+}
+
+/* Fix parent d-flex in navbar to never wrap (important for mobile) */
+.navbar>.d-flex,
+.navbar>.d-flex.align-items-center {
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+}
+
+/* Profile info column */
+.profile-info {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start;
+    margin-left: 6px;
+    text-align: left;
+}
+
+/* Mobile menu toggle */
+.mobile-menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: #000;
+    font-size: 1.5rem;
+    margin-right: 10px;
+}
+
+/* Dropdown menu items */
+.sidebar .menu .collapse li {
+    padding: 8px 10px;
+}
+
+.sidebar .menu .collapse li a {
+    font-size: 0.85rem;
+}
+
+/* ตั้งค่าให้ dropdown items ไม่ active จนกว่าจะถูกเลือก */
+.sidebar .menu .collapse li:not(.active) a i {
+    color: white;
+}
+
+/* เมื่อ dropdown item ถูกเลือก */
+.sidebar .menu .collapse li.active a i {
+    color: black;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .sidebar {
+        transform: translateX(-100%);
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    .main-content {
+        margin-left: 0;
+    }
+
+    .mobile-menu-toggle {
+        display: block;
+    }
+
+    .navbar-brand h2 {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .profile-info .role {
+        display: none;
+    }
+}
+
+@media (max-width: 576px) {
+    .navbar {
+        flex-wrap: nowrap !important;
+    }
+
+    .navbar>.d-flex,
+    .navbar>.d-flex.align-items-center {
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+    }
+
+    .profile-dropdown {
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 8px;
+    }
+
+    .navbar-brand h2 span:first-child {
+        font-size: 0;
+        /* Hide text but keep space */
+        color: transparent;
+    }
+
+    .navbar-brand h2 span:first-child::after {
+        content: "MFU";
+        font-size: 1.2rem;
+        color: red;
+    }
+
+    .profile-info .name {
+        display: none;
+    }
+}
+
+.dropdown-toggle::after {
+    display: none !important;
+}
+
+.profile-img-circle-navbar {
+    width: 38px;
+    height: 38px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2.5px solid #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
+    background: #d1d1d1;
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+    body.sidebar-open .content-container {
+        margin-left: 220px !important;
+        /* ให้เท่ากับ sidebar จริง */
+        transition: margin-left 0.2s;
+    }
+}
+
+@media (min-width: 992px) {
+    body.sidebar-open .content-container {
+        margin-left: 220px !important;
+        transition: margin-left 0.2s;
+    }
+}
+
+@media (max-width: 767.98px) {
+    body.sidebar-open .content-container {
+        margin-left: 220px !important;
+        transition: margin-left 0.2s;
+
+    }
+}
